@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map - Sync map by events</title>
+<style type="text/css">
+    html,
+    body,
+    .container {
+        margin: 0px;
+        height: 100%;
+        width: 100%
+    }
+
+    .map {
+        width: 500px;
+        height: 500px;
+    }
+
+    .attr {
+        background-color: #34495e;
+        color: #fff;
+        padding: 0px 4px;
+        font: 16px sans-serif
+    }
+
+    #map1 {
+        position: absolute;
+        z-index: -1;
+        top: 0px;
+        left: 0px;
+    }
+</style>
+<link rel="stylesheet" href="https://unpkg.com/maptalks/dist/maptalks.css">
+<script type="text/javascript" src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
+
+<body>
+    <div class="container">
+        <div id="map0" class="map"></div>
+        <div id="map1" class="map"></div>
+    </div>
+
+    <script>
+
+        const geojson = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    120.63069245791723,
+                                    31.278252427430715
+                                ],
+                                [
+                                    120.63807087185455,
+                                    31.27945797959174
+                                ],
+                                [
+                                    120.63904742664045,
+                                    31.272440831607327
+                                ],
+                                [
+                                    120.63532205097601,
+                                    31.270740563004694
+                                ],
+                                [
+                                    120.6304754457426,
+                                    31.271791641757346
+                                ],
+                                [
+                                    120.62906486660756,
+                                    31.2747284173756
+                                ],
+                                [
+                                    120.63069245791723,
+                                    31.278252427430715
+                                ]
+                            ]
+                        ]
+                    },
+                    "properties": {
+                        "name": "2-8ce1b98",
+                        "_color": "#eada48",
+                        "center": [
+                            120.63377885328974,
+                            31.274568643461237
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    120.64501526144272,
+                                    31.28075624930065
+                                ],
+                                [
+                                    120.64939167363104,
+                                    31.281003536742702
+                                ],
+                                [
+                                    120.65080225276608,
+                                    31.27482115616911
+                                ],
+                                [
+                                    120.64884914319441,
+                                    31.2713897600876
+                                ],
+                                [
+                                    120.64515993622581,
+                                    31.271915297311267
+                                ],
+                                [
+                                    120.64280897100059,
+                                    31.27460476550911
+                                ],
+                                [
+                                    120.64204942838944,
+                                    31.27837607451542
+                                ],
+                                [
+                                    120.64501526144272,
+                                    31.28075624930065
+                                ]
+                            ]
+                        ]
+                    },
+                    "properties": {
+                        "name": "3-c7f86f0",
+                        "_color": "#81f9ef",
+                        "center": [
+                            120.6462966666643,
+                            31.276123834233694
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    120.65586587017401,
+                                    31.28044713908625
+                                ],
+                                [
+                                    120.65977208931736,
+                                    31.28174539517815
+                                ],
+                                [
+                                    120.66215922323818,
+                                    31.272811795230183
+                                ],
+                                [
+                                    120.66082098149468,
+                                    31.270678734478082
+                                ],
+                                [
+                                    120.65428891503848,
+                                    31.272440831607327
+                                ],
+                                [
+                                    120.65291450459915,
+                                    31.27485206907997
+                                ],
+                                [
+                                    120.6523358054668,
+                                    31.278005132775064
+                                ],
+                                [
+                                    120.65586587017401,
+                                    31.28044713908625
+                                ]
+                            ]
+                        ]
+                    },
+                    "properties": {
+                        "name": "4-6219eb3",
+                        "_color": "#b5223f",
+                        "center": [
+                            120.65687962704695,
+                            31.27585444249072
+                        ]
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    120.63287704714185,
+                                    31.265639573342668
+                                ],
+                                [
+                                    120.64369148717742,
+                                    31.268885689580912
+                                ],
+                                [
+                                    120.64633180196881,
+                                    31.26084748337027
+                                ],
+                                [
+                                    120.64484888544212,
+                                    31.259579857585294
+                                ],
+                                [
+                                    120.6391342315103,
+                                    31.259703529143025
+                                ],
+                                [
+                                    120.6358067114993,
+                                    31.26078564836112
+                                ],
+                                [
+                                    120.63287704714185,
+                                    31.265639573342668
+                                ]
+                            ]
+                        ]
+                    },
+                    "properties": {
+                        "name": "5-92e935f",
+                        "_color": "#4ece70",
+                        "center": [
+                            120.64044836078996,
+                            31.26257363023055
+                        ]
+                    }
+                }
+            ]
+        };
+        var map0 = new maptalks.Map('map0', {
+            center: [-0.113049, 51.498568],
+            zoom: 14,
+            zoomControl: true,
+            baseLayer: new maptalks.TileLayer('base', {
+                urlTemplate: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                subdomains: ["a", "b", "c", "d"],
+                attribution: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
+            })
+        });
+
+
+        var map1 = new maptalks.Map('map1', {
+            center: map0.getCenter(),
+            zoom: map0.getZoom(),
+            draggable: false,        // disable draggble
+            scrollWheelZoom: false,  // disable scroll wheel zoom
+            dblClickZoom: false,     // disable doubleclick
+            baseLayer: new maptalks.TileLayer('base1', {
+                urlTemplate: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                subdomains: ["a", "b", "c", "d"],
+                attribution: '&copy; <a href="http://osm.org">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/">CARTO</a>'
+            })
+        });
+
+        map0.on('moving moveend', function (e) {
+            map1.setCenter(e.target.getCenter());
+        });
+
+        map0.on('zooming zoomend', function (e) {
+            map1.setCenterAndZoom(e.target.getCenter(), e.target.getZoom());
+        });
+
+        map0.on('pitch', function (e) {
+            map1.setPitch(e.target.getPitch());
+        });
+
+        map0.on('rotate', function (e) {
+            map1.setBearing(e.target.getBearing());
+        });
+
+
+        const layer = new maptalks.VectorLayer('layer').addTo(map0);
+        const layer1 = new maptalks.VectorLayer('layer').addTo(map1);
+
+        const polygons = geojson.features.map(f => {
+            const polygon = maptalks.GeoJSON.toGeometry(f);
+            polygon.setId(maptalks.Util.GUID());
+            polygon.setSymbol({
+                polygonOpacity: 0,
+                polygonFill: '#fff',
+                lineWidth: 2
+            });
+            return polygon;
+        })
+        layer.addGeometry(polygons);
+
+        const polygons1 = polygons.map(p => {
+            const p1 = p.copy();
+            const symbol = Object.assign({}, p.getSymbol())
+            symbol.polygonOpacity = 1;
+            p1.updateSymbol(symbol);
+            return p1;
+        });
+
+        map0.setCenter(polygons[0].getCenter());
+
+        layer1.addGeometry(polygons1);
+
+
+        map0.on('click', function (e) {
+            const coordinate = e.coordinate;
+            mapIdentify(map0, layer, coordinate, (geos) => {
+                if (geos.length === 0) {
+                    mapIdentify(map1, layer1, coordinate, (geos1) => {
+                        if (geos1.length) {
+                            geos = geos1.map(geo => {
+                                return findGeo(geo.getId());
+                            }).filter(geo => {
+                                return geo;
+                            });
+                        }
+                    });
+                }
+                geos.forEach(geo => {
+                    geo.setInfoWindow({
+                        content: JSON.stringify(geo.getProperties())
+                    });
+                    geo.openInfoWindow(coordinate);
+                });
+            });
+        });
+
+        function findGeo(id) {
+            console.log(id);
+            return layer.getGeometries().filter(geo => {
+                return geo.getId() === id;
+            })[0];
+        }
+
+        function mapIdentify(map, layer, coordinate, callback) {
+            //identify
+            map.identify(
+                {
+                    'coordinate': coordinate,
+                    'layers': [layer]
+                },
+                callback
+            );
+        }
+
+    </script>
+</body>
+
+</html>
