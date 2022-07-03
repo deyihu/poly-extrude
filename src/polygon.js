@@ -1,6 +1,6 @@
 
 import earcut from 'earcut';
-import { isClockwise } from './util';
+import { generateNormal, isClockwise } from './util';
 
 export function extrudePolygons(polygons, options) {
     options = Object.assign({}, { depth: 2 }, options);
@@ -11,60 +11,59 @@ export function extrudePolygons(polygons, options) {
         }
     });
     const result = flatVertices(polygon, options);
+    result.polygon = polygon;
+    const time = 'earcut';
+    console.time(time);
     const triangles = earcut(result.flatVertices, result.holes, 2);
-    const indices = generateIndices(result, triangles);
-    result.indices = indices;
-    result.normal = new Float32Array(result.position.length).fill(1, 0, result.position.length);
+    console.timeEnd(time);
+    generateTopAndBottom(result, triangles);
+    generateSides(result, options);
+    result.position = new Float32Array(result.points);
+    result.indices = new Uint32Array(result.index);
+    result.normal = generateNormal(result.indices, result.position);
     return result;
 
 }
 
-function generateIndices(result, triangles) {
+function generateTopAndBottom(result, triangles) {
     const index = [];
     const { count } = result;
     for (let i = 0, len = triangles.length; i < len; i += 3) {
+        // top
         const a = triangles[i], b = triangles[i + 1], c = triangles[i + 2];
         index[i] = a;
         index[i + 1] = b;
         index[i + 2] = c;
+        // bottom
         const idx = len + i;
         index[idx] = count + a;
         index[idx + 1] = count + b;
         index[idx + 2] = count + c;
     }
-    generateRingsIndices(result, index);
-    return new Uint32Array(index);
-
+    result.index = index;
 }
 
-function generateRingsIndices(result, index) {
-    const { holes, vertices, count } = result;
-    let end = vertices.length;
-    if (holes.length) {
-        end = holes[0];
-    }
-    for (let i = 1; i < end - 1; i++) {
-        const a = i, b = a + 1, c = a + count, d = b + count;
-        index.push(a, c, b);
-        index.push(c, d, b);
-
-    }
-    if (holes.length) {
-        for (let r = 0, len = holes.length; r < len; r++) {
-            const star = holes[r];
-            end = holes[r + 1];
-            if (end === undefined) {
-                end = vertices.length;
-            } else {
-                // end++;
+function generateSides(result, options) {
+    const { points, index, polygon } = result;
+    const z = options.depth;
+    for (let i = 0, len = polygon.length; i < len; i++) {
+        const ring = polygon[i];
+        for (let j = 0, len1 = ring.length - 1; j < len1; j++) {
+            const v1 = ring[j];
+            let v2 = ring[j + 1];
+            if (j === len1 - 1) {
+                v2 = ring[0];
             }
-            for (let i = star; i < end - 1; i++) {
-                const a = i, b = a + 1, c = a + count, d = b + count;
-                // index.push(c, a, b);
-                // index.push(c, b, d);
-                index.push(a, c, b);
-                index.push(c, d, b);
-            }
+            // const p1 = [v1[0], v1[1], options.depth],
+            //     p2 = [v2[0], v2[1], options.depth],
+            //     p3 = [v1[0], v1[1], 0],
+            //     p4 = [v2[0], v2[1], 0];
+            const idx = points.length / 3;
+            points.push(v1[0], v1[1], 0, v2[0], v2[1], 0, v1[0], v1[1], z, v2[0], v2[1], z);
+            const a = idx, b = idx + 1, c = idx + 2, d = idx + 3;
+            // points.push(p3, p4, p1, p2);
+            index.push(a, c, b);
+            index.push(c, d, b);
         }
     }
 }
@@ -74,7 +73,7 @@ function calPolygonPointsCount(polygon) {
     let i = 0;
     const len = polygon.length;
     while (i < len) {
-        count += polygon[i].length;
+        count += (polygon[i].length);
         i++;
     }
     return count;
@@ -82,40 +81,32 @@ function calPolygonPointsCount(polygon) {
 
 function flatVertices(polygon, options) {
     const count = calPolygonPointsCount(polygon);
-    const position = new Float32Array(count * 2 * 3);
     const len = polygon.length;
+    const holes = [], flatVertices = new Float32Array(count * 2);
     let idx = 0;
-    const holes = [], vertices = [], flatVertices = [];
     for (let i = 0; i < len; i++) {
         const ring = polygon[i];
         if (i > 0) {
-            holes.push(vertices.length);
+            holes.push(idx / 2);
         }
         for (let j = 0, len1 = ring.length; j < len1; j++) {
             const c = ring[j];
-            vertices.push(c);
-            flatVertices.push(c[0], c[1]);
-            position[idx] = c[0];
-            idx++;
-            position[idx] = c[1];
-            idx++;
-            position[idx] = 0;
-            idx++;
+            flatVertices[idx++] = c[0];
+            flatVertices[idx++] = c[1];
         }
     }
-    for (let i = 0; i < count; i++) {
-        const idx = i * 3;
-        const x = position[idx], y = position[idx + 1];
-        const idx1 = (count + i) * 3;
-        position[idx1] = x;
-        position[idx1 + 1] = y;
-        position[idx1 + 2] = options.depth;
+    const points = [];
+    for (let k = 0; k < 2; k++) {
+        const z = k === 0 ? options.depth : 0;
+        for (let i = 0, len = flatVertices.length; i < len; i += 2) {
+            const x = flatVertices[i], y = flatVertices[i + 1];
+            points.push(x, y, z);
+        }
     }
     return {
-        vertices,
         flatVertices,
         holes,
-        position,
+        points,
         count
     };
 

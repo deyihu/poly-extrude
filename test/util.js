@@ -1,8 +1,11 @@
 // eslint-disable-next-line no-unused-vars
-function flatCoordinates(feature, scale = 1000) {
+function flatCoordinates(feature) {
     const { coordinates, type } = feature.geometry;
     const [minx, miny, maxx, maxy] = window.bbox(feature);
     const centerX = (minx + maxx) / 2, centerY = (miny + maxy) / 2;
+    const dx = maxx - minx, dy = maxy - miny;
+    const max = Math.max(dx, dy);
+    const scale = 160 / max;
     if (['MultiLineString', 'Polygon'].includes(type)) {
         coordinates.forEach(coord => {
             coord.forEach(c => {
@@ -54,6 +57,7 @@ function createBufferGeometry(result) {
     // geometry.addAttribute('uv', new THREE.BufferAttribute(uv, 2));
     // eslint-disable-next-line no-undef
     geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+    // geometry.computeVertexNormals();
 
     // eslint-disable-next-line no-undef
     const topColor = new THREE.Color('#fff'), bottomColor = new THREE.Color('#2d2f61');
