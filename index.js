@@ -1,2 +1,3 @@
 import { extrudePolygons } from './src/polygon';
-export { extrudePolygons };
+import { extrudePolylines } from './src/polyline';
+export { extrudePolygons, extrudePolylines };
