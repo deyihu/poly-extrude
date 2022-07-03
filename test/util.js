@@ -1,25 +1,14 @@
 // eslint-disable-next-line no-unused-vars
-function flatCoordinates(feature) {
-    const { coordinates, type } = feature.geometry;
-    const [minx, miny, maxx, maxy] = window.bbox(feature);
+function flatCoordinates(geojson) {
+    const [minx, miny, maxx, maxy] = window.bbox(geojson);
     const centerX = (minx + maxx) / 2, centerY = (miny + maxy) / 2;
     const dx = maxx - minx, dy = maxy - miny;
     const max = Math.max(dx, dy);
-    const scale = 160 / max;
-    if (['MultiLineString', 'Polygon'].includes(type)) {
-        coordinates.forEach(coord => {
-            coord.forEach(c => {
-                c[0] -= centerX;
-                c[1] -= centerY;
-                c[0] *= scale;
-                c[1] *= scale;
-            });
-        });
-
-    }
-    if (type === 'MultiPolygon') {
-        coordinates.forEach(coords => {
-            coords.forEach(coord => {
+    geojson.features.forEach(feature => {
+        const { coordinates, type } = feature.geometry;
+        const scale = 160 / max;
+        if (['MultiLineString', 'Polygon'].includes(type)) {
+            coordinates.forEach(coord => {
                 coord.forEach(c => {
                     c[0] -= centerX;
                     c[1] -= centerY;
@@ -27,16 +16,30 @@ function flatCoordinates(feature) {
                     c[1] *= scale;
                 });
             });
-        });
-    }
-    if (type === 'LineString') {
-        coordinates.forEach(c => {
-            c[0] -= centerX;
-            c[1] -= centerY;
-            c[0] *= scale;
-            c[1] *= scale;
-        });
-    }
+
+        }
+        if (type === 'MultiPolygon') {
+            coordinates.forEach(coords => {
+                coords.forEach(coord => {
+                    coord.forEach(c => {
+                        c[0] -= centerX;
+                        c[1] -= centerY;
+                        c[0] *= scale;
+                        c[1] *= scale;
+                    });
+                });
+            });
+        }
+        if (type === 'LineString') {
+            coordinates.forEach(c => {
+                c[0] -= centerX;
+                c[1] -= centerY;
+                c[0] *= scale;
+                c[1] *= scale;
+            });
+        }
+    });
+
 }
 
 // eslint-disable-next-line no-unused-vars
@@ -46,6 +49,7 @@ function getGeoJSON(url) {
 
 // eslint-disable-next-line no-unused-vars
 function createBufferGeometry(result) {
+    // eslint-disable-next-line no-unused-vars
     const { position, indices, normal } = result;
     // eslint-disable-next-line no-undef
     const geometry = new THREE.BufferGeometry();
@@ -79,4 +83,49 @@ function createBufferGeometry(result) {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     return geometry;
+}
+
+// eslint-disable-next-line no-unused-vars
+function createScene() {
+    const THREE = window.THREE;
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xb0b0b0);
+    //
+
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 100000);
+    camera.position.set(0, 0, 200);
+
+    //
+
+    const directionalLight = new THREE.DirectionalLight('#fff', 0.9);
+    directionalLight.position.set(0.75, 0.75, 1.0).normalize();
+    scene.add(directionalLight);
+
+    // const ambientLight = new THREE.AmbientLight('#FFF', 0.5);
+    // scene.add(ambientLight);
+
+    //
+
+    const helper = new THREE.GridHelper(200, 10);
+    helper.rotation.x = Math.PI / 2;
+    scene.add(helper);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    //
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.minDistance = 10;
+    controls.maxDistance = 1000;
+
+    function animation() {
+        requestAnimationFrame(animation);
+
+        renderer.render(scene, camera);
+    }
+    animation();
+    return scene;
+
 }

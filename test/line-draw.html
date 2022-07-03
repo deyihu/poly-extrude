@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name=renderer content=webkit>
+<script type="text/javascript" src="https://unpkg.com/@maptalks/geojson-bbox@1.0.4/dist/bbox.umd.js"></script>
+<script type="text/javascript" src="https://unpkg.com/three@0.138.0/build/three.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/three@0.142.0/examples/js/controls/OrbitControls.js"></script>
+<script type="text/javascript" src="./../dist/poly-extrude.js"></script>
+<script type="text/javascript" src="./util.js"></script>
+<!-- <script type="text/javascript" src="http://localhost/geometry-extrude/dist/geometry-extrude.js"></script> -->
+
+<style type="text/css">
+    html,
+    body {
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .container {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <canvas id="c" width="2000" height="1600" style="width:2000px;height:1600px;"></canvas>
+    <script>
+
+        function draw(coordinates, { offsetPoints: points }, scale) {
+            const ctx = document.querySelector('#c').getContext('2d');
+            const height = ctx.canvas.height;
+            let minx = Infinity, miny = Infinity;
+            coordinates.forEach(c => {
+                const [x, y] = c;
+                minx = Math.min(x, minx);
+                miny = Math.min(y, miny);
+            });
+            function drawLine(coordinates, color = 'black') {
+                coordinates.forEach((c, index) => {
+                    let [x, y] = c;
+                    x -= minx
+                    y -= miny;
+                    x *= scale;
+                    y *= scale;
+                    x += 50;
+                    y += 50;
+                    y = height - y;
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                ctx.stroke();
+            }
+
+            function drawPoints(coordinates) {
+                const size = 2;
+                coordinates.forEach(c => {
+                    let [x, y] = c;
+                    x -= minx
+                    y -= miny;
+                    x *= scale;
+                    y *= scale;
+                    x += 50;
+                    y += 50;
+                    ctx.fillStyle = 'red';
+                    ctx.fillRect(x - size / 2, height - y - size / 2, size, size);
+                });
+            }
+            drawLine(coordinates);
+            drawPoints(points, 'red');
+        }
+
+
+        function test() {
+
+            getGeoJSON('./data/line.geojson').then(geojson => {
+                flatCoordinates(geojson);
+                geojson.features.forEach(feature => {
+                    const { type, coordinates } = feature.geometry;
+                    const time = 'time';
+                    console.time(time);
+                    const result = polyextrude.extrudePolylines(type === 'LineString' ? [coordinates] : coordinates, { depth: 4, lineWidth: 2 });
+                    console.timeEnd(time);
+                    console.log(result);
+                    draw(coordinates, result, 10);
+                });
+            })
+        }
+        test();
+
+
+
+    </script>
+</body>
+
+</html>
