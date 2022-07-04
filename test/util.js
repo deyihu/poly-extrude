@@ -97,7 +97,7 @@ function createScene() {
 
     //
 
-    const directionalLight = new THREE.DirectionalLight('#fff', 0.9);
+    const directionalLight = new THREE.DirectionalLight('#fff', 0.85);
     directionalLight.position.set(0.75, 0.75, 1.0).normalize();
     scene.add(directionalLight);
 

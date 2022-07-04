@@ -35,11 +35,7 @@
                 flatCoordinates(geojson);
                 geojson.features.forEach(feature => {
                     const { type, coordinates } = feature.geometry;
-                    const time = 'time';
-                    console.time(time);
                     const result = polyextrude.extrudePolylines(type === 'LineString' ? [coordinates] : coordinates, { depth: 4, lineWidth: 1 });
-                    console.timeEnd(time);
-                    console.log(result);
                     const geometry = createBufferGeometry(result);
                     const mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: '#FFF', wireframe: false, vertexColors: false }));
                     scene.add(mesh);

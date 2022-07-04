@@ -34,16 +34,7 @@
                 flatCoordinates(geojson);
                 geojson.features.forEach(feature => {
                     const { type, coordinates } = feature.geometry;
-                    // const time1 = 'time1';
-                    // console.time(time1);
-                    // const result1 = geometryExtrude.extrudePolygon(type === 'Polygon' ? [coordinates] : coordinates, { depth: 4 });
-                    // console.timeEnd(time1);
-                    const time = 'time';
-                    console.time(time);
                     const result = polyextrude.extrudePolygons(type === 'Polygon' ? [coordinates] : coordinates, { depth: feature.properties.height / 10 });
-
-                    console.timeEnd(time);
-                    console.log(result);
                     const geometry = createBufferGeometry(result);
                     const mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: '#FFF', wireframe: false, vertexColors: true }));
                     scene.add(mesh);
