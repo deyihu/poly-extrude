@@ -1,15 +1,19 @@
-import { generateNormal } from './util';
+import { generateNormal, merge } from './util';
 
 export function extrudePolylines(lines, options) {
     options = Object.assign({}, { depth: 2, lineWidth: 1 }, options);
-    const line = lines[0];
-    const result = expandLine(line, options);
-    result.line = line;
-    generateTopAndBottom(result, options);
-    generateSides(result, options);
-    result.position = new Float32Array(result.points);
-    result.indices = new Uint32Array(result.index);
-    result.normal = generateNormal(result.indices, result.position);
+    const results = lines.map(line => {
+        const result = expandLine(line, options);
+        result.line = line;
+        generateTopAndBottom(result, options);
+        generateSides(result, options);
+        result.position = new Float32Array(result.points);
+        result.indices = new Uint32Array(result.index);
+        result.normal = generateNormal(result.indices, result.position);
+        return result;
+    });
+    const result = merge(results);
+    result.lines = lines;
     return result;
 }
 

@@ -108,3 +108,41 @@ export function generateNormal(indices, position) {
 
     return normals;
 }
+
+export function merge(results) {
+    if (results.length === 1) {
+        const result = {
+            position: results[0].position,
+            normal: results[0].normal,
+            indices: results[0].indices,
+            results
+        };
+        return result;
+    }
+    let plen = 0, ilen = 0;
+    for (let i = 0, len = results.length; i < len; i++) {
+        const { position, indices } = results[i];
+        plen += position.length;
+        ilen += indices.length;
+    }
+    const result = {
+        position: new Float32Array(plen),
+        normal: new Float32Array(plen),
+        indices: new Uint32Array(ilen),
+        results
+    };
+    let pOffset = 0, pCount = 0, iIdx = 0;
+    for (let i = 0, len = results.length; i < len; i++) {
+        const { position, indices, normal } = results[i];
+        result.position.set(position, pOffset);
+        result.normal.set(normal, pOffset);
+        for (let j = 0, len1 = indices.length; j < len1; j++) {
+            const pIndex = indices[j] + pCount;
+            result.indices[iIdx] = pIndex;
+            iIdx++;
+        }
+        pOffset += position.length;
+        pCount += position.length / 3;
+    }
+    return result;
+}

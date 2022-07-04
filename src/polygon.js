@@ -1,26 +1,30 @@
 
 import earcut from 'earcut';
-import { generateNormal, isClockwise } from './util';
+import { generateNormal, isClockwise, merge } from './util';
 
 export function extrudePolygons(polygons, options) {
     options = Object.assign({}, { depth: 2 }, options);
-    const polygon = polygons[0];
-    polygon.slice(1, Infinity).forEach((coordinates, index) => {
-        if (isClockwise(coordinates)) {
-            polygon[index + 1] = coordinates.reverse();
-        }
+    const results = polygons.map(polygon => {
+        polygon.slice(1, Infinity).forEach((coordinates, index) => {
+            if (isClockwise(coordinates)) {
+                polygon[index + 1] = coordinates.reverse();
+            }
+        });
+        const result = flatVertices(polygon, options);
+        result.polygon = polygon;
+        const time = 'earcut';
+        console.time(time);
+        const triangles = earcut(result.flatVertices, result.holes, 2);
+        console.timeEnd(time);
+        generateTopAndBottom(result, triangles);
+        generateSides(result, options);
+        result.position = new Float32Array(result.points);
+        result.indices = new Uint32Array(result.index);
+        result.normal = generateNormal(result.indices, result.position);
+        return result;
     });
-    const result = flatVertices(polygon, options);
-    result.polygon = polygon;
-    const time = 'earcut';
-    console.time(time);
-    const triangles = earcut(result.flatVertices, result.holes, 2);
-    console.timeEnd(time);
-    generateTopAndBottom(result, triangles);
-    generateSides(result, options);
-    result.position = new Float32Array(result.points);
-    result.indices = new Uint32Array(result.index);
-    result.normal = generateNormal(result.indices, result.position);
+    const result = merge(results);
+    result.polygons = polygons;
     return result;
 
 }
