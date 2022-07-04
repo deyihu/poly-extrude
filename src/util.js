@@ -146,3 +146,11 @@ export function merge(results) {
     }
     return result;
 }
+
+export function radToAngle(rad) {
+    return rad * 180 / Math.PI;
+}
+
+export function angleToRad(angle) {
+    return angle / 180 * Math.PI;
+}
