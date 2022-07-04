@@ -86,7 +86,7 @@
                     const result = polyextrude.extrudePolylines(type === 'LineString' ? [coordinates] : coordinates, { depth: 4, lineWidth: 2 });
                     console.timeEnd(time);
                     console.log(result);
-                    draw(coordinates, result, 10);
+                    draw(coordinates, result.results[0], 10);
                 });
             })
         }
