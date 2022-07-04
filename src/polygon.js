@@ -82,25 +82,32 @@ function calPolygonPointsCount(polygon) {
 function flatVertices(polygon, options) {
     const count = calPolygonPointsCount(polygon);
     const len = polygon.length;
-    const holes = [], flatVertices = new Float32Array(count * 2);
-    let idx = 0;
+    const holes = [], flatVertices = new Float32Array(count * 2), points = [];
+    const offset = count * 3;
+    const z = options.depth;
+
+    let idx0 = 0, idx1 = 0;
     for (let i = 0; i < len; i++) {
         const ring = polygon[i];
         if (i > 0) {
-            holes.push(idx / 2);
+            holes.push(idx0 / 2);
         }
         for (let j = 0, len1 = ring.length; j < len1; j++) {
             const c = ring[j];
-            flatVertices[idx++] = c[0];
-            flatVertices[idx++] = c[1];
-        }
-    }
-    const points = [];
-    for (let k = 0; k < 2; k++) {
-        const z = k === 0 ? options.depth : 0;
-        for (let i = 0, len = flatVertices.length; i < len; i += 2) {
-            const x = flatVertices[i], y = flatVertices[i + 1];
-            points.push(x, y, z);
+            flatVertices[idx0++] = c[0];
+            flatVertices[idx0++] = c[1];
+
+            // top vertices
+            points[idx1] = c[0];
+            points[idx1 + 1] = c[1];
+            points[idx1 + 2] = z;
+
+            // bottom vertices
+            points[offset + idx1] = c[0];
+            points[offset + idx1 + 1] = c[1];
+            points[offset + idx1 + 2] = 0;
+
+            idx1 += 3;
         }
     }
     return {
