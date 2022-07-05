@@ -114,6 +114,7 @@ export function merge(results) {
         const result = {
             position: results[0].position,
             normal: results[0].normal,
+            uv: results[0].uv,
             indices: results[0].indices,
             results
         };
@@ -128,29 +129,77 @@ export function merge(results) {
     const result = {
         position: new Float32Array(plen),
         normal: new Float32Array(plen),
+        uv: new Float32Array(plen / 3 * 2),
         indices: new Uint32Array(ilen),
         results
     };
-    let pOffset = 0, pCount = 0, iIdx = 0;
+    let pOffset = 0, pCount = 0, iIdx = 0, uvOffset = 0;
     for (let i = 0, len = results.length; i < len; i++) {
-        const { position, indices, normal } = results[i];
+        const { position, indices, normal, uv } = results[i];
         result.position.set(position, pOffset);
         result.normal.set(normal, pOffset);
+        result.uv.set(uv, uvOffset);
         for (let j = 0, len1 = indices.length; j < len1; j++) {
             const pIndex = indices[j] + pCount;
             result.indices[iIdx] = pIndex;
             iIdx++;
         }
+        uvOffset += uv.length;
         pOffset += position.length;
         pCount += position.length / 3;
     }
     return result;
 }
 
-export function radToAngle(rad) {
+export function radToDeg(rad) {
     return rad * 180 / Math.PI;
 }
 
-export function angleToRad(angle) {
+export function degToRad(angle) {
     return angle / 180 * Math.PI;
+}
+
+// https://github.com/mrdoob/three.js/blob/16f13e3b07e31d0e9a00df7c3366bbe0e464588c/src/geometries/ExtrudeGeometry.js?_pjax=%23js-repo-pjax-container#L736
+export function generateSideWallUV(uvs, vertices, indexA, indexB, indexC, indexD) {
+
+    const a_x = vertices[indexA * 3];
+    const a_y = vertices[indexA * 3 + 1];
+    const a_z = vertices[indexA * 3 + 2];
+    const b_x = vertices[indexB * 3];
+    const b_y = vertices[indexB * 3 + 1];
+    const b_z = vertices[indexB * 3 + 2];
+    const c_x = vertices[indexC * 3];
+    const c_y = vertices[indexC * 3 + 1];
+    const c_z = vertices[indexC * 3 + 2];
+    const d_x = vertices[indexD * 3];
+    const d_y = vertices[indexD * 3 + 1];
+    const d_z = vertices[indexD * 3 + 2];
+
+    if (Math.abs(a_y - b_y) < Math.abs(a_x - b_x)) {
+
+        uvs.push(a_x, 1 - a_z);
+        uvs.push(b_x, 1 - b_z);
+        uvs.push(c_x, 1 - c_z);
+        uvs.push(d_x, 1 - d_z);
+        // return [
+        //     new Vector2(a_x, 1 - a_z),
+        //     new Vector2(b_x, 1 - b_z),
+        //     new Vector2(c_x, 1 - c_z),
+        //     new Vector2(d_x, 1 - d_z)
+        // ];
+
+    } else {
+        uvs.push(a_y, 1 - a_z);
+        uvs.push(b_y, 1 - b_z);
+        uvs.push(c_y, 1 - c_z);
+        uvs.push(d_y, 1 - d_z);
+        // return [
+        //     new Vector2(a_y, 1 - a_z),
+        //     new Vector2(b_y, 1 - b_z),
+        //     new Vector2(c_y, 1 - c_z),
+        //     new Vector2(d_y, 1 - d_z)
+        // ];
+
+    }
+
 }

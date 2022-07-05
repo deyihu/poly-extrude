@@ -1,13 +1,23 @@
 
 import earcut from 'earcut';
-import { generateNormal, isClockwise, merge } from './util';
+import { generateNormal, generateSideWallUV, isClockwise, merge } from './util';
 
 export function extrudePolygons(polygons, options) {
     options = Object.assign({}, { depth: 2 }, options);
     const results = polygons.map(polygon => {
+        if (!isClockwise(polygon[0])) {
+            polygon[0] = polygon[0].reverse();
+        }
         polygon.slice(1, Infinity).forEach((coordinates, index) => {
             if (isClockwise(coordinates)) {
                 polygon[index + 1] = coordinates.reverse();
+            }
+        });
+        polygon.forEach(ring => {
+            const len = ring.length;
+            const [x1, y1] = ring[0], [x2, y2] = ring[len - 1];
+            if (x1 === x2 && y1 === y2) {
+                ring.splice(len - 1, 1);
             }
         });
         const result = flatVertices(polygon, options);
@@ -20,6 +30,7 @@ export function extrudePolygons(polygons, options) {
         generateSides(result, options);
         result.position = new Float32Array(result.points);
         result.indices = new Uint32Array(result.index);
+        result.uv = new Float32Array(result.uvs);
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
@@ -40,19 +51,20 @@ function generateTopAndBottom(result, triangles) {
         index[i + 2] = c;
         // bottom
         const idx = len + i;
-        index[idx] = count + a;
-        index[idx + 1] = count + b;
-        index[idx + 2] = count + c;
+        const a1 = count + a, b1 = count + b, c1 = count + c;
+        index[idx] = a1;
+        index[idx + 1] = b1;
+        index[idx + 2] = c1;
     }
     result.index = index;
 }
 
 function generateSides(result, options) {
-    const { points, index, polygon } = result;
+    const { points, index, polygon, uvs } = result;
     const z = options.depth;
     for (let i = 0, len = polygon.length; i < len; i++) {
         const ring = polygon[i];
-        for (let j = 0, len1 = ring.length - 1; j < len1; j++) {
+        for (let j = 0, len1 = ring.length; j < len1; j++) {
             const v1 = ring[j];
             let v2 = ring[j + 1];
             if (j === len1 - 1) {
@@ -68,6 +80,8 @@ function generateSides(result, options) {
             // points.push(p3, p4, p1, p2);
             index.push(a, c, b);
             index.push(c, d, b);
+
+            generateSideWallUV(uvs, points, a, b, c, d);
         }
     }
 }
@@ -86,11 +100,11 @@ function calPolygonPointsCount(polygon) {
 function flatVertices(polygon, options) {
     const count = calPolygonPointsCount(polygon);
     const len = polygon.length;
-    const holes = [], flatVertices = new Float32Array(count * 2), points = [];
-    const offset = count * 3;
+    const holes = [], flatVertices = new Float32Array(count * 2), points = [], uvs = [];
+    const pOffset = count * 3, uOffset = count * 2;
     const z = options.depth;
 
-    let idx0 = 0, idx1 = 0;
+    let idx0 = 0, idx1 = 0, idx2 = 0;
     for (let i = 0; i < len; i++) {
         const ring = polygon[i];
         if (i > 0) {
@@ -98,27 +112,37 @@ function flatVertices(polygon, options) {
         }
         for (let j = 0, len1 = ring.length; j < len1; j++) {
             const c = ring[j];
-            flatVertices[idx0++] = c[0];
-            flatVertices[idx0++] = c[1];
+            const x = c[0], y = c[1];
+
+            flatVertices[idx0++] = x;
+            flatVertices[idx0++] = y;
 
             // top vertices
-            points[idx1] = c[0];
-            points[idx1 + 1] = c[1];
+            points[idx1] = x;
+            points[idx1 + 1] = y;
             points[idx1 + 2] = z;
 
             // bottom vertices
-            points[offset + idx1] = c[0];
-            points[offset + idx1 + 1] = c[1];
-            points[offset + idx1 + 2] = 0;
+            points[pOffset + idx1] = x;
+            points[pOffset + idx1 + 1] = y;
+            points[pOffset + idx1 + 2] = 0;
+
+            uvs[idx2] = x;
+            uvs[idx2 + 1] = y;
+
+            uvs[uOffset + idx2] = x;
+            uvs[uOffset + idx2 + 1] = y;
 
             idx1 += 3;
+            idx2 += 2;
         }
     }
     return {
         flatVertices,
         holes,
         points,
-        count
+        count,
+        uvs
     };
 
 }

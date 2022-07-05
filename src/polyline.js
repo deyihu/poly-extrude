@@ -1,4 +1,4 @@
-import { angleToRad, generateNormal, merge, radToAngle } from './util';
+import { degToRad, generateNormal, generateSideWallUV, merge, radToDeg } from './util';
 
 export function extrudePolylines(lines, options) {
     options = Object.assign({}, { depth: 2, lineWidth: 1 }, options);
@@ -9,6 +9,7 @@ export function extrudePolylines(lines, options) {
         generateSides(result, options);
         result.position = new Float32Array(result.points);
         result.indices = new Uint32Array(result.index);
+        result.uv = new Float32Array(result.uvs);
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
@@ -19,7 +20,7 @@ export function extrudePolylines(lines, options) {
 
 function generateTopAndBottom(result, options) {
     const z = options.depth;
-    const points = [], index = [];
+    const points = [], index = [], uvs = [];
     const { leftPoints, rightPoints } = result;
     for (let i = 0, len = leftPoints.length; i < len; i++) {
         // top left
@@ -48,6 +49,10 @@ function generateTopAndBottom(result, options) {
         points[idx3 + 1] = y2;
         points[idx3 + 2] = 0;
     }
+    for (let i = 0, len = points.length; i < len; i += 3) {
+        const x = points[i], y = points[i + 1];
+        uvs.push(x, y);
+    }
     for (let i = 0, len = leftPoints.length; i < len - 1; i++) {
         // top
         // left1 left2 right1,right2
@@ -64,10 +69,11 @@ function generateTopAndBottom(result, options) {
     }
     result.index = index;
     result.points = points;
+    result.uvs = uvs;
 }
 
 function generateSides(result, options) {
-    const { points, index, leftPoints, rightPoints } = result;
+    const { points, index, leftPoints, rightPoints, uvs } = result;
     const z = options.depth;
     const rings = [leftPoints, rightPoints];
     function addOneSideIndex(v1, v2) {
@@ -77,6 +83,7 @@ function generateSides(result, options) {
         // points.push(p3, p4, p1, p2);
         index.push(a, c, b);
         index.push(c, d, b);
+        generateSideWallUV(uvs, points, a, b, c, d);
     }
 
     for (let i = 0, len = rings.length; i < len; i++) {
@@ -115,7 +122,7 @@ function expandLine(line, options) {
             dx = p2[0] - p1[0];
         let rAngle = 0;
         const rad = Math.atan(dy / dx);
-        const angle = radToAngle(rad);
+        const angle = radToDeg(rad);
         preAngle = angle;
         if (i === 0) {
             rAngle = angle;
@@ -129,7 +136,7 @@ function expandLine(line, options) {
             const vAngle = getAngle(TEMPV1, TEMPV2);
             rAngle = angle - vAngle / 2;
         }
-        const rRad = angleToRad(rAngle);
+        const rRad = degToRad(rAngle);
         const [op1, op2] = calOffsetPoint(rRad, radius, p1);
         points.push(op1, op2);
         if (leftOnLine(op1, p1, p2)) {
@@ -142,7 +149,7 @@ function expandLine(line, options) {
     }
     let rAngle = preAngle;
     rAngle -= 90;
-    const rRad = angleToRad(rAngle);
+    const rRad = degToRad(rAngle);
     const p1 = line[len - 2];
     const p2 = line[len - 1];
     const [op1, op2] = calOffsetPoint(rRad, radius, p2);
