@@ -1,8 +1,9 @@
 {
   "name": "poly-extrude",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "dist/poly-extrude.js",
+  "module": "dist/poly-extrude.mjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/**/*.js",
@@ -37,5 +38,10 @@
   },
   "dependencies": {
     "earcut": "^2.2.3"
-  }
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "index.js"
+  ]
 }

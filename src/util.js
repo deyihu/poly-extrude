@@ -100,9 +100,9 @@ export function generateNormal(indices, position) {
     for (let i = 0; i < normals.length; i += 3) {
         v3Set(n, normals[i], normals[i + 1], normals[i + 2]);
         v3Normalize(n, n);
-        normals[i] = n[0] || 1;
-        normals[i + 1] = n[1] || 1;
-        normals[i + 2] = n[2] || 1;
+        normals[i] = n[0] || 0;
+        normals[i + 1] = n[1] || 0;
+        normals[i + 2] = n[2] || 0;
 
     }
 
