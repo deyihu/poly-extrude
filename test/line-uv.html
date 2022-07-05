@@ -27,30 +27,33 @@
 <body>
     <script>
         const scene = createScene();
-
         function getTexture() {
-            const texture = new THREE.TextureLoader().load('./data/building-texture-dark.jpg');
+            const texture = new THREE.TextureLoader().load('./data/a.png');
             texture.needsUpdate = true; //使用贴图时进行更新
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
             // texture.repeat.set(0.002, 0.002);
-            texture.repeat.set(0.1, 0.1);
+            texture.repeat.set(1, 2);
             return texture;
         }
 
-        const material = new THREE.MeshBasicMaterial({
+        const material = new THREE.MeshPhongMaterial({
             color: '#FFF',
             wireframe: false,
             vertexColors: false,
             map: getTexture()
         })
 
-
         function test() {
-            getGeoJSON('./data/buildings-ny.geojson').then(geojson => {
+
+            getGeoJSON('./data/line.geojson').then(geojson => {
                 flatCoordinates(geojson);
                 geojson.features.forEach(feature => {
                     const { type, coordinates } = feature.geometry;
-                    const result = polyextrude.extrudePolygons(type === 'Polygon' ? [coordinates] : coordinates, { depth: feature.properties.height / 10 });
+                    const time = 'time';
+                    console.time(time);
+                    const result = polyextrude.extrudePolylines(type === 'LineString' ? [coordinates] : coordinates, { depth: 10, lineWidth: 1 });
+                    console.timeEnd(time);
+                    console.log(result);
                     const geometry = createBufferGeometry(result);
                     const mesh = new THREE.Mesh(geometry, material);
                     scene.add(mesh);
@@ -58,7 +61,6 @@
             })
         }
         test();
-
 
 
     </script>

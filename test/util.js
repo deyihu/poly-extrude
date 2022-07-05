@@ -1,12 +1,12 @@
 // eslint-disable-next-line no-unused-vars
-function flatCoordinates(geojson) {
+function flatCoordinates(geojson, scale) {
     const [minx, miny, maxx, maxy] = window.bbox(geojson);
     const centerX = (minx + maxx) / 2, centerY = (miny + maxy) / 2;
     const dx = maxx - minx, dy = maxy - miny;
     const max = Math.max(dx, dy);
     geojson.features.forEach(feature => {
         const { coordinates, type } = feature.geometry;
-        const scale = 160 / max;
+        scale = scale || 160 / max;
         if (['MultiLineString', 'Polygon'].includes(type)) {
             coordinates.forEach(coord => {
                 coord.forEach(c => {
@@ -50,15 +50,15 @@ function getGeoJSON(url) {
 // eslint-disable-next-line no-unused-vars
 function createBufferGeometry(result) {
     // eslint-disable-next-line no-unused-vars
-    const { position, indices, normal } = result;
+    const { position, indices, normal, uv } = result;
     // eslint-disable-next-line no-undef
     const geometry = new THREE.BufferGeometry();
     // eslint-disable-next-line no-undef
     geometry.setAttribute('position', new THREE.BufferAttribute(position, 3));
     // eslint-disable-next-line no-undef
     geometry.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
-    // // eslint-disable-next-line no-undef
-    // geometry.addAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    // eslint-disable-next-line no-undef
+    geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
     // eslint-disable-next-line no-undef
     geometry.setIndex(new THREE.BufferAttribute(indices, 1));
     // geometry.computeVertexNormals();
