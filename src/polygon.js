@@ -61,24 +61,24 @@ function generateSides(result, options) {
     const z = options.depth;
     for (let i = 0, len = polygon.length; i < len; i++) {
         const ring = polygon[i];
-        for (let j = 0, len1 = ring.length; j < len1; j++) {
+        let j = 0;
+        const len1 = ring.length;
+        while (j < len1) {
             const v1 = ring[j];
             let v2 = ring[j + 1];
             if (j === len1 - 1) {
                 v2 = ring[0];
             }
-            // const p1 = [v1[0], v1[1], options.depth],
-            //     p2 = [v2[0], v2[1], options.depth],
-            //     p3 = [v1[0], v1[1], 0],
-            //     p4 = [v2[0], v2[1], 0];
             const idx = points.length / 3;
-            points.push(v1[0], v1[1], 0, v2[0], v2[1], 0, v1[0], v1[1], z, v2[0], v2[1], z);
+            const x1 = v1[0], y1 = v1[1], x2 = v2[0], y2 = v2[1];
+            points.push(x1, y1, 0, x2, y2, 0, x1, y1, z, x2, y2, z);
             const a = idx, b = idx + 1, c = idx + 2, d = idx + 3;
             // points.push(p3, p4, p1, p2);
-            index.push(a, c, b);
-            index.push(c, d, b);
+            index.push(a, c, b, c, d, b);
+            // index.push(c, d, b);
 
             generateSideWallUV(uvs, points, a, b, c, d);
+            j++;
         }
     }
 }
@@ -107,7 +107,9 @@ function flatVertices(polygon, options) {
         if (i > 0) {
             holes.push(idx0 / 2);
         }
-        for (let j = 0, len1 = ring.length; j < len1; j++) {
+        let j = 0;
+        const len1 = ring.length;
+        while (j < len1) {
             const c = ring[j];
             const x = c[0], y = c[1];
 
@@ -132,6 +134,7 @@ function flatVertices(polygon, options) {
 
             idx1 += 3;
             idx2 += 2;
+            j++;
         }
     }
     return {

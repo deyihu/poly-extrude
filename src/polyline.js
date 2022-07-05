@@ -22,7 +22,8 @@ function generateTopAndBottom(result, options) {
     const z = options.depth;
     const points = [], index = [], uvs = [];
     const { leftPoints, rightPoints } = result;
-    for (let i = 0, len = leftPoints.length; i < len; i++) {
+    let i = 0, len = leftPoints.length;
+    while (i < len) {
         // top left
         const idx0 = i * 3;
         const [x1, y1] = leftPoints[i];
@@ -48,12 +49,19 @@ function generateTopAndBottom(result, options) {
         points[idx3] = x2;
         points[idx3 + 1] = y2;
         points[idx3 + 2] = 0;
+
+        i++;
     }
-    for (let i = 0, len = points.length; i < len; i += 3) {
+    i = 0;
+    len = points.length;
+    while (i < len) {
         const x = points[i], y = points[i + 1];
         uvs.push(x, y);
+        i += 3;
     }
-    for (let i = 0, len = leftPoints.length; i < len - 1; i++) {
+    i = 0;
+    len = leftPoints.length;
+    while (i < len - 1) {
         // top
         // left1 left2 right1,right2
         const a1 = i, b1 = i + 1, c1 = a1 + len, d1 = b1 + len;
@@ -66,6 +74,7 @@ function generateTopAndBottom(result, options) {
         const a2 = i + len2, b2 = a2 + 1, c2 = a2 + len, d2 = b2 + len;
         index.push(a2, c2, b2);
         index.push(c2, d2, b2);
+        i++;
     }
     result.index = index;
     result.points = points;
@@ -76,13 +85,12 @@ function generateSides(result, options) {
     const { points, index, leftPoints, rightPoints, uvs } = result;
     const z = options.depth;
     const rings = [leftPoints, rightPoints];
+
     function addOneSideIndex(v1, v2) {
         const idx = points.length / 3;
         points.push(v1[0], v1[1], 0, v2[0], v2[1], 0, v1[0], v1[1], z, v2[0], v2[1], z);
         const a = idx, b = idx + 1, c = idx + 2, d = idx + 3;
-        // points.push(p3, p4, p1, p2);
-        index.push(a, c, b);
-        index.push(c, d, b);
+        index.push(a, c, b, c, d, b);
         generateSideWallUV(uvs, points, a, b, c, d);
     }
 
@@ -94,10 +102,13 @@ function generateSides(result, options) {
             });
             ring = ring.reverse();
         }
-        for (let j = 0, len1 = ring.length - 1; j < len1; j++) {
+        let j = 0;
+        const len1 = ring.length - 1;
+        while (j < len1) {
             const v1 = ring[j];
             const v2 = ring[j + 1];
             addOneSideIndex(v1, v2);
+            j++;
         }
     }
     const len = leftPoints.length;
@@ -115,7 +126,8 @@ function expandLine(line, options) {
     const radius = options.lineWidth / 2;
     const points = [], leftPoints = [], rightPoints = [];
     const len = line.length;
-    for (let i = 0; i < len - 1; i++) {
+    let i = 0;
+    while (i < len - 1) {
         const p1 = line[i],
             p2 = line[i + 1];
         const dy = p2[1] - p1[1],
@@ -146,6 +158,7 @@ function expandLine(line, options) {
             leftPoints.push(op2);
             rightPoints.push(op1);
         }
+        i++;
     }
     let rAngle = preAngle;
     rAngle -= 90;

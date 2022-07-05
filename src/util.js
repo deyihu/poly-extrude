@@ -64,8 +64,9 @@ export function generateNormal(indices, position) {
 
     const len = indices.length;
     const normals = new Float32Array(position.length);
+    let f = 0;
+    while (f < len) {
 
-    for (let f = 0; f < len; f += 3) {
         // const i1 = indices[f++] * 3;
         // const i2 = indices[f++] * 3;
         // const i3 = indices[f++] * 3;
@@ -79,13 +80,6 @@ export function generateNormal(indices, position) {
         v3Set(p2, position[i2], position[i2 + 1], position[i2 + 2]);
         v3Set(p3, position[i3], position[i3 + 1], position[i3 + 2]);
 
-        // pA.fromBufferAttribute(positionAttribute, vA);
-        // pB.fromBufferAttribute(positionAttribute, vB);
-        // pC.fromBufferAttribute(positionAttribute, vC);
-
-        // cb.subVectors(pC, pB);
-        // ab.subVectors(pA, pB);
-        // cb.cross(ab);
         v3Sub(v32, p3, p2);
         v3Sub(v21, p1, p2);
         v3Cross(n, v32, v21);
@@ -95,15 +89,18 @@ export function generateNormal(indices, position) {
             normals[i2 + i] += n[i];
             normals[i3 + i] += n[i];
         }
+        f += 3;
     }
 
-    for (let i = 0; i < normals.length; i += 3) {
+    let i = 0;
+    const l = normals.length;
+    while (i < l) {
         v3Set(n, normals[i], normals[i + 1], normals[i + 2]);
         v3Normalize(n, n);
         normals[i] = n[0] || 0;
         normals[i + 1] = n[1] || 0;
         normals[i + 2] = n[2] || 0;
-
+        i += 3;
     }
 
     return normals;
@@ -139,10 +136,13 @@ export function merge(results) {
         result.position.set(position, pOffset);
         result.normal.set(normal, pOffset);
         result.uv.set(uv, uvOffset);
-        for (let j = 0, len1 = indices.length; j < len1; j++) {
+        let j = 0;
+        const len1 = indices.length;
+        while (j < len1) {
             const pIndex = indices[j] + pCount;
             result.indices[iIdx] = pIndex;
             iIdx++;
+            j++;
         }
         uvOffset += uv.length;
         pOffset += position.length;
@@ -162,18 +162,19 @@ export function degToRad(angle) {
 // https://github.com/mrdoob/three.js/blob/16f13e3b07e31d0e9a00df7c3366bbe0e464588c/src/geometries/ExtrudeGeometry.js?_pjax=%23js-repo-pjax-container#L736
 export function generateSideWallUV(uvs, vertices, indexA, indexB, indexC, indexD) {
 
-    const a_x = vertices[indexA * 3];
-    const a_y = vertices[indexA * 3 + 1];
-    const a_z = vertices[indexA * 3 + 2];
-    const b_x = vertices[indexB * 3];
-    const b_y = vertices[indexB * 3 + 1];
-    const b_z = vertices[indexB * 3 + 2];
-    const c_x = vertices[indexC * 3];
-    const c_y = vertices[indexC * 3 + 1];
-    const c_z = vertices[indexC * 3 + 2];
-    const d_x = vertices[indexD * 3];
-    const d_y = vertices[indexD * 3 + 1];
-    const d_z = vertices[indexD * 3 + 2];
+    const idx1 = indexA * 3, idx2 = indexB * 3, idx3 = indexC * 3, idx4 = indexD * 3;
+    const a_x = vertices[idx1];
+    const a_y = vertices[idx1 + 1];
+    const a_z = vertices[idx1 + 2];
+    const b_x = vertices[idx2];
+    const b_y = vertices[idx2 + 1];
+    const b_z = vertices[idx2 + 2];
+    const c_x = vertices[idx3];
+    const c_y = vertices[idx3 + 1];
+    const c_z = vertices[idx3 + 2];
+    const d_x = vertices[idx4];
+    const d_y = vertices[idx4 + 1];
+    const d_z = vertices[idx4 + 2];
 
     if (Math.abs(a_y - b_y) < Math.abs(a_x - b_x)) {
 
@@ -181,25 +182,11 @@ export function generateSideWallUV(uvs, vertices, indexA, indexB, indexC, indexD
         uvs.push(b_x, 1 - b_z);
         uvs.push(c_x, 1 - c_z);
         uvs.push(d_x, 1 - d_z);
-        // return [
-        //     new Vector2(a_x, 1 - a_z),
-        //     new Vector2(b_x, 1 - b_z),
-        //     new Vector2(c_x, 1 - c_z),
-        //     new Vector2(d_x, 1 - d_z)
-        // ];
-
     } else {
         uvs.push(a_y, 1 - a_z);
         uvs.push(b_y, 1 - b_z);
         uvs.push(c_y, 1 - c_z);
         uvs.push(d_y, 1 - d_z);
-        // return [
-        //     new Vector2(a_y, 1 - a_z),
-        //     new Vector2(b_y, 1 - b_z),
-        //     new Vector2(c_y, 1 - c_z),
-        //     new Vector2(d_y, 1 - d_z)
-        // ];
-
     }
 
 }
