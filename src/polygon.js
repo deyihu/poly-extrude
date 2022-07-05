@@ -22,10 +22,7 @@ export function extrudePolygons(polygons, options) {
         });
         const result = flatVertices(polygon, options);
         result.polygon = polygon;
-        const time = 'earcut';
-        console.time(time);
         const triangles = earcut(result.flatVertices, result.holes, 2);
-        console.timeEnd(time);
         generateTopAndBottom(result, triangles);
         generateSides(result, options);
         result.position = new Float32Array(result.points);
