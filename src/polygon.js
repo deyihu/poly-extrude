@@ -7,7 +7,7 @@ export function extrudePolygons(polygons, options) {
     const results = polygons.map(polygon => {
         for (let i = 0, len = polygon.length; i < len; i++) {
             const ring = polygon[i];
-            valiateRing(ring);
+            validateRing(ring);
             if (i === 0) {
                 if (!isClockwise(ring)) {
                     polygon[i] = ring.reverse();
@@ -146,7 +146,7 @@ function flatVertices(polygon, options) {
 
 }
 
-function valiateRing(ring) {
+function validateRing(ring) {
     if (!isClosedRing(ring)) {
         ring.push(ring[0]);
     }
