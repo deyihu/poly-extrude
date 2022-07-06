@@ -14,8 +14,8 @@ const FILEMANE = pkg.name;
 const sourceMap = !product;
 
 const banner = `/*!\n * ${pkg.name} v${pkg.version}\n  */`;
-let outro = pkg.name + ' v' + pkg.version;
-outro = `typeof console !== 'undefined' && console.log('${outro}');`;
+// let outro = pkg.name + ' v' + pkg.version;
+// outro = `typeof console !== 'undefined' && console.log('${outro}');`;
 const plugins = [
     json(),
     nodeResolve(),
@@ -56,7 +56,7 @@ export default [
             'sourcemap': sourceMap,
             'extend': true,
             'banner': banner,
-            'outro': outro,
+            // 'outro': outro,
             'globals': globals
         }
     },
@@ -73,7 +73,7 @@ export default [
             'sourcemap': false,
             'extend': true,
             'banner': banner,
-            'outro': outro,
+            // 'outro': outro,
             'globals': globals
         }
     },
@@ -90,19 +90,8 @@ export default [
             'sourcemap': false,
             'extend': true,
             'banner': banner,
-            'outro': outro,
+            // 'outro': outro,
             'globals': globals
         }
     }
-    // {
-    //     'sourcemap': false,
-    //     'format': 'es',
-    //     // banner,
-    //     'file': `dist/${FILEMANE}.es.js`,
-    //     'extend': true,
-    //     'banner': banner,
-    //     'globals': {
-    //         'YY': 'YY'
-    //     }
-    // }
 ];
