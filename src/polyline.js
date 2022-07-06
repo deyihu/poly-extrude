@@ -88,8 +88,8 @@ function generateSides(result, options) {
 
     function addOneSideIndex(v1, v2) {
         const idx = points.length / 3;
-        points.push(v1[0], v1[1], 0, v2[0], v2[1], 0, v1[0], v1[1], z, v2[0], v2[1], z);
-        const a = idx, b = idx + 1, c = idx + 2, d = idx + 3;
+        points.push(v1[0], v1[1], z, v2[0], v2[1], z, v1[0], v1[1], 0, v2[0], v2[1], 0);
+        const a = idx + 2, b = idx + 3, c = idx, d = idx + 1;
         index.push(a, c, b, c, d, b);
         generateSideWallUV(uvs, points, a, b, c, d);
     }

@@ -70,8 +70,8 @@ function generateSides(result, options) {
             }
             const idx = points.length / 3;
             const x1 = v1[0], y1 = v1[1], x2 = v2[0], y2 = v2[1];
-            points.push(x1, y1, 0, x2, y2, 0, x1, y1, z, x2, y2, z);
-            const a = idx, b = idx + 1, c = idx + 2, d = idx + 3;
+            points.push(x1, y1, z, x2, y2, z, x1, y1, 0, x2, y2, 0);
+            const a = idx + 2, b = idx + 3, c = idx, d = idx + 1;
             // points.push(p3, p4, p1, p2);
             index.push(a, c, b, c, d, b);
             // index.push(c, d, b);
