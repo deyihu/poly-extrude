@@ -5,21 +5,20 @@ import { generateNormal, generateSideWallUV, isClockwise, merge } from './util';
 export function extrudePolygons(polygons, options) {
     options = Object.assign({}, { depth: 2 }, options);
     const results = polygons.map(polygon => {
-        if (!isClockwise(polygon[0])) {
-            polygon[0] = polygon[0].reverse();
+        for (let i = 0, len = polygon.length; i < len; i++) {
+            const ring = polygon[i];
+            valiateRing(ring);
+            if (i === 0) {
+                if (!isClockwise(ring)) {
+                    polygon[i] = ring.reverse();
+                }
+            } else if (isClockwise(ring)) {
+                polygon[i] = ring.reverse();
+            }
+            if (isClosedRing(ring)) {
+                ring.splice(ring.length - 1, 1);
+            }
         }
-        polygon.slice(1, Infinity).forEach((coordinates, index) => {
-            if (isClockwise(coordinates)) {
-                polygon[index + 1] = coordinates.reverse();
-            }
-        });
-        polygon.forEach(ring => {
-            const len = ring.length;
-            const [x1, y1] = ring[0], [x2, y2] = ring[len - 1];
-            if (x1 === x2 && y1 === y2) {
-                ring.splice(len - 1, 1);
-            }
-        });
         const result = flatVertices(polygon, options);
         result.polygon = polygon;
         const triangles = earcut(result.flatVertices, result.holes, 2);
@@ -145,4 +144,16 @@ function flatVertices(polygon, options) {
         uvs
     };
 
+}
+
+function valiateRing(ring) {
+    if (!isClosedRing(ring)) {
+        ring.push(ring[0]);
+    }
+}
+
+function isClosedRing(ring) {
+    const len = ring.length;
+    const [x1, y1] = ring[0], [x2, y2] = ring[len - 1];
+    return (x1 === x2 && y1 === y2);
 }
