@@ -1,3 +1,3 @@
 import { extrudePolygons } from './src/polygon';
-import { extrudePolylines } from './src/polyline';
-export { extrudePolygons, extrudePolylines };
+import { extrudePolylines, expandLine } from './src/polyline';
+export { extrudePolygons, extrudePolylines, expandLine };
