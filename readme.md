@@ -31,7 +31,7 @@ pnpm i poly-extrude
 ### ESM
 
 ```js
-  import {extrudePolygons,extrudePolyline} from 'poly-extrude';
+  import {extrudePolygons,extrudePolylines} from 'poly-extrude';
   const polygons=[
     //polygon
      [
@@ -57,7 +57,7 @@ pnpm i poly-extrude
         [[x,y],[x,y],...........],
   ];
 
-  const result = extrudePolyline(polylines,{depth:2,lineWidth:2});
+  const result = extrudePolylines(polylines,{depth:2,lineWidth:2});
   const {positon,normal,uv,indices}=result;
   //do something
 ```
@@ -93,7 +93,7 @@ pnpm i poly-extrude
             [[x,y],[x,y],...........],
     ];
 
-    const result = polyextrude.extrudePolyline(polylines,{depth:2,lineWidth:2});
+    const result = polyextrude.extrudePolylines(polylines,{depth:2,lineWidth:2});
     const {positon,normal,uv,indices}=result;
     //do something
 </script>
