@@ -1,5 +1,5 @@
 /*!
- * poly-extrude v0.0.7
+ * poly-extrude v0.0.8
   */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -1223,7 +1223,6 @@
       x: 0,
       y: 0
     };
-
     function expandLine(line, options) {
       var preAngle = 0;
       var radius = options.lineWidth / 2;
@@ -1336,6 +1335,7 @@
       return (y1 - y2) * x + (x2 - x1) * y + x1 * y2 - x2 * y1 > 0;
     }
 
+    exports.expandLine = expandLine;
     exports.extrudePolygons = extrudePolygons;
     exports.extrudePolylines = extrudePolylines;
 

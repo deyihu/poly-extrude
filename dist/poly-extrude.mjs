@@ -1,5 +1,5 @@
 /*!
- * poly-extrude v0.0.7
+ * poly-extrude v0.0.8
   */
 var earcut$2 = {exports: {}};
 
@@ -1217,7 +1217,6 @@ var TEMPV1 = {
   x: 0,
   y: 0
 };
-
 function expandLine(line, options) {
   var preAngle = 0;
   var radius = options.lineWidth / 2;
@@ -1330,4 +1329,4 @@ function leftOnLine(p, p1, p2) {
   return (y1 - y2) * x + (x2 - x1) * y + x1 * y2 - x2 * y1 > 0;
 }
 
-export { extrudePolygons, extrudePolylines };
+export { expandLine, extrudePolygons, extrudePolylines };
