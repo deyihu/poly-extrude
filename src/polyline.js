@@ -121,7 +121,7 @@ function generateSides(result, options) {
 
 const TEMPV1 = { x: 0, y: 0 }, TEMPV2 = { x: 0, y: 0 };
 
-function expandLine(line, options) {
+export function expandLine(line, options) {
     let preAngle = 0;
     const radius = options.lineWidth / 2;
     const points = [], leftPoints = [], rightPoints = [];

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name=renderer content=webkit>
+<script type="text/javascript" src="https://unpkg.com/@maptalks/geojson-bbox@1.0.4/dist/bbox.umd.js"></script>
+<script type="text/javascript" src="https://unpkg.com/three@0.138.0/build/three.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/three@0.142.0/examples/js/controls/OrbitControls.js"></script>
+<script type="text/javascript" src="./../dist/poly-extrude.js"></script>
+<script type="text/javascript" src="./util.js"></script>
+<!-- <script type="text/javascript" src="http://localhost/geometry-extrude/dist/geometry-extrude.js"></script> -->
+
+<style type="text/css">
+    html,
+    body {
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .container {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <script>
+        const scene = createScene();
+
+        function getTexture() {
+            const texture = new THREE.TextureLoader().load('./data/a.png');
+            texture.needsUpdate = true; //使用贴图时进行更新
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            // texture.repeat.set(0.002, 0.002);
+            texture.repeat.set(1, 1);
+            return texture;
+        }
+
+        function distance(c1, c2) {
+            const [x1, y1] = c1, [x2, y2] = c2;
+            const dx = x2 - x1, dy = y2 - y1;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+
+        function testWall(coordinates) {
+            console.log(coordinates);
+            const lines = [];
+            const len = coordinates.length;
+            for (let i = 0; i < len - 2; i++) {
+                const c1 = coordinates[i], c2 = coordinates[i + 1], c3 = coordinates[i + 2];
+                lines.push([c1, c2, c3]);
+            }
+            lines.push([coordinates[len - 2], coordinates[0], coordinates[1]]);
+            const material = new THREE.MeshLambertMaterial({ color: '#fff', wireframe: false, vertexColors: false, map: getTexture() });
+            lines.forEach(line => {
+                const [c1, c2, c3] = line;
+                const [x1, y1] = c1, [x2, y2] = c2, [x3, y3] = c3;
+                const dx1 = x2 - x1, dy1 = y2 - y1, dx2 = x3 - x2, dy2 = y3 - y2;
+                const dis1 = distance(c1, c2), dis2 = distance(c2, c3);
+                const offsetDistance = 2.5;
+                const c11 = [x1 + dx1 / dis1 * (dis1 - offsetDistance), y1 + dy1 / dis1 * (dis1 - offsetDistance)],
+                    c33 = [x2 + dx2 / dis2 * offsetDistance, y2 + dy2 / dis2 * offsetDistance];
+                line[0] = c11;
+                line[2] = c33;
+
+                const fatLine = polyextrude.expandLine(line, { lineWidth: 0.1 });
+                // console.log(fatLine);
+
+                const result = polyextrude.extrudePolylines([fatLine.rightPoints], { depth: 10, lineWidth: 0 });
+                const geometry = createBufferGeometry(result);
+                const mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+            });
+        }
+
+
+        function test() {
+            getGeoJSON('./data/苏州火车站.geojson').then(geojson => {
+                flatCoordinates(geojson);
+                geojson.features.forEach(feature => {
+                    const { type, coordinates } = feature.geometry;
+                    const time = 'time';
+                    console.time(time);
+                    const result = polyextrude.extrudePolylines(coordinates, { depth: 10, lineWidth: 0 });
+
+                    console.timeEnd(time);
+                    console.log(result);
+                    const geometry = createBufferGeometry(result);
+                    const mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: '#FFF', wireframe: false, vertexColors: false }));
+                    scene.add(mesh);
+                    testWall(coordinates[0])
+                });
+            })
+        }
+        test();
+
+
+
+    </script>
+</body>
+
+</html>

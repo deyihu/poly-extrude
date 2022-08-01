@@ -1,11 +1,15 @@
 # poly-extrude
 
-Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks/maptalks.three) project
-
-![](./gallery/building.png)
-![](./gallery/buildings.png)
-![](./gallery/multi-polygon.png)
-![](./gallery/street.png)
+Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks/maptalks.three) project<br>
+[building](https://deyihu.github.io/poly-extrude/test/building.html)<br>
+![](./gallery/building.png)<br>
+[buildings](https://deyihu.github.io/poly-extrude/test/buildings.html)<br>
+![](./gallery/buildings.png)<br>
+[multi-polygon](https://deyihu.github.io/poly-extrude/test/multi-polygon.html)<br>
+![](./gallery/multi-polygon.png)<br>
+[street](https://deyihu.github.io/poly-extrude/test/street.html)<br>
+![](./gallery/street.png)<br>
+[line-uv](https://deyihu.github.io/poly-extrude/test/line-uv.html)<br>
 ![](./gallery/line-uv.png)
 
 ## install
