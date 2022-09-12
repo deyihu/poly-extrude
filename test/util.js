@@ -55,10 +55,14 @@ function createBufferGeometry(result) {
     const geometry = new THREE.BufferGeometry();
     // eslint-disable-next-line no-undef
     geometry.setAttribute('position', new THREE.BufferAttribute(position, 3));
-    // eslint-disable-next-line no-undef
-    geometry.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
-    // eslint-disable-next-line no-undef
-    geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    if (normal) {
+        // eslint-disable-next-line no-undef
+        geometry.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
+    }
+    if (uv) {
+        // eslint-disable-next-line no-undef
+        geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+    }
     // eslint-disable-next-line no-undef
     geometry.setIndex(new THREE.BufferAttribute(indices, 1));
     // geometry.computeVertexNormals();
