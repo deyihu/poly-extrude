@@ -1,6 +1,6 @@
 {
   "name": "poly-extrude",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "description": "",
   "main": "dist/poly-extrude.js",
   "module": "dist/poly-extrude.mjs",
@@ -37,7 +37,7 @@
     "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
-    "earcut": "^2.2.3"
+    "earcut": "^2.2.4"
   },
   "files": [
     "dist/",
