@@ -1,6 +1,9 @@
 # poly-extrude
 
+
 Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks/maptalks.three) project<br>
+
+## Examples
 [building](https://deyihu.github.io/poly-extrude/test/building.html)<br>
 ![](./gallery/building.png)<br>
 [buildings](https://deyihu.github.io/poly-extrude/test/buildings.html)<br>
@@ -16,7 +19,7 @@ Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks
 [cylinder](https://deyihu.github.io/poly-extrude/test/cylinder.html)<br>
 ![](./gallery/cylinder.png)
 
-## install
+## Install
 
 ```sh
 npm i poly-extrude
