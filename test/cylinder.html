@@ -28,13 +28,28 @@
     <script>
         const scene = createScene();
 
+        function getTexture() {
+            const texture = new THREE.TextureLoader().load('./data/a.png');
+            texture.needsUpdate = true; //使用贴图时进行更新
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            // texture.repeat.set(0.002, 0.002);
+            texture.repeat.set(2, 2);
+            return texture;
+        }
+
+        const material = new THREE.MeshLambertMaterial({
+            color: '#FFF',
+            wireframe: false,
+            vertexColors: false,
+            map: getTexture()
+        })
 
         function test() {
-
-            // const result = polyextrude.cylinder([0, 0], { radius: 4, radialSegments: 6, height: 15 });
+            // const result = polyextrude.cylinder([0, 0], { radius: 4, radialSegments: 100, height: 40 });
             // const geometry = createBufferGeometry(result);
-            // const mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: '#FFF', wireframe: false, vertexColors: true, side: 0 }));
+            // const mesh = new THREE.Mesh(geometry, material);
             // scene.add(mesh);
+            // console.log(result);
 
             const time = 'time';
             console.time(time);
@@ -42,14 +57,14 @@
             const size = 40;
             for (let i = -size; i < size; i++) {
                 for (let j = -size; j < size; j++) {
-                    const result = polyextrude.cylinder([i * 2, j * 2], { radius: 1, radialSegments: 6, height: 15 });
+                    const result = polyextrude.cylinder([i * 2, j * 2], { radius: 1, radialSegments: 6, height: 6 + Math.random() * 6 });
                     results.push(result);
                 }
             }
             console.timeEnd(time);
             results.forEach(result => {
                 const geometry = createBufferGeometry(result);
-                const mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: '#FFF', wireframe: false, vertexColors: true, side: 0 }));
+                const mesh = new THREE.Mesh(geometry, material);
                 scene.add(mesh);
             });
         }
