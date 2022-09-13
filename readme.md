@@ -11,6 +11,10 @@ Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks
 ![](./gallery/street.png)<br>
 [line-uv](https://deyihu.github.io/poly-extrude/test/line-uv.html)<br>
 ![](./gallery/line-uv.png)
+[ny-building](https://deyihu.github.io/poly-extrude/test/ny-building.html)<br>
+![](./gallery/ny-building.png)
+[cylinder](https://deyihu.github.io/poly-extrude/test/cylinder.html)<br>
+![](./gallery/cylinder.png)
 
 ## install
 
@@ -31,34 +35,79 @@ pnpm i poly-extrude
 ### ESM
 
 ```js
-  import {extrudePolygons,extrudePolylines} from 'poly-extrude';
-  const polygons=[
-    //polygon
-     [
-        //outring
-        [[x,y],[x,y],...........],
-        //holes
-        [[x,y],[x,y],...........],
-        ........
+  import {
+      extrudePolygons,
+      extrudePolylines,
+      cylinder
+  } from 'poly-extrude';
+  const polygons = [
+      //polygon
+      [
+          //outring
+          [
+              [x, y],
+              [x, y], ...........
+          ],
+          //holes
+          [
+              [x, y],
+              [x, y], ...........
+          ],
+          ........
 
-     ],
-     //other polygons
-     ......
+      ],
+      //other polygons
+      ......
   ]
 
-  const result = extrudePolygons(polygons,{depth:2});
-  const {positon,normal,uv,indices}=result;
+  const result = extrudePolygons(polygons, {
+      depth: 2
+  });
+  const {
+      positon,
+      normal,
+      uv,
+      indices
+  } = result;
   //do something
 
-  const polylines=[
-        // polyline
-        [[x,y],[x,y],...........],
-        //polyline
-        [[x,y],[x,y],...........],
+  const polylines = [
+      // polyline
+      [
+          [x, y],
+          [x, y], ...........
+      ],
+      //polyline
+      [
+          [x, y],
+          [x, y], ...........
+      ],
   ];
 
-  const result = extrudePolylines(polylines,{depth:2,lineWidth:2});
-  const {positon,normal,uv,indices}=result;
+  const result = extrudePolylines(polylines, {
+      depth: 2,
+      lineWidth: 2
+  });
+  const {
+      positon,
+      normal,
+      uv,
+      indices
+  } = result;
+  //do something
+
+  const center = [0, 0];
+  const result = cylinder(center, {
+      radius: 1,
+      height: 2,
+      radialSegments: 6
+  });
+  const {
+      positon,
+      normal,
+      uv,
+      indices
+  } = result;
   //do something
 ```
 
@@ -68,13 +117,19 @@ pnpm i poly-extrude
 <script src="https://unpkg.com/poly-extrude/dist/poly-extrude.js"></script>
 
 <script>
-    const polygons=[
+    const polygons = [
         //polygon
         [
             //outring
-            [[x,y],[x,y],...........],
+            [
+                [x, y],
+                [x, y], ...........
+            ],
             //holes
-            [[x,y],[x,y],...........],
+            [
+                [x, y],
+                [x, y], ...........
+            ],
             ........
 
         ],
@@ -82,19 +137,54 @@ pnpm i poly-extrude
         ......
     ]
 
-    const result =    polyextrude.extrudePolygons(polygons,{depth:2})
-    const {positon,normal,uv,indices}=result;
+    const result = polyextrude.extrudePolygons(polygons, {
+        depth: 2
+    })
+    const {
+        positon,
+        normal,
+        uv,
+        indices
+    } = result;
     //do something
 
-    const polylines=[
-            // polyline
-            [[x,y],[x,y],...........],
-            //polyline
-            [[x,y],[x,y],...........],
+    const polylines = [
+        // polyline
+        [
+            [x, y],
+            [x, y], ...........
+        ],
+        //polyline
+        [
+            [x, y],
+            [x, y], ...........
+        ],
     ];
 
-    const result = polyextrude.extrudePolylines(polylines,{depth:2,lineWidth:2});
-    const {positon,normal,uv,indices}=result;
+    const result = polyextrude.extrudePolylines(polylines, {
+        depth: 2,
+        lineWidth: 2
+    });
+    const {
+        positon,
+        normal,
+        uv,
+        indices
+    } = result;
+    //do something
+
+    const center = [0, 0];
+    const result = polyextrude.cylinder(center, {
+        radius: 1,
+        height: 2,
+        radialSegments: 6
+    });
+    const {
+        positon,
+        normal,
+        uv,
+        indices
+    } = result;
     //do something
 </script>
 ```
