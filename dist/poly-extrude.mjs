@@ -1,5 +1,5 @@
 /*!
- * poly-extrude v0.0.8
+ * poly-extrude v0.1.0
   */
 var earcut$2 = {exports: {}};
 
@@ -32,10 +32,10 @@ function earcut(data, holeIndices, dim) {
 
 
     invSize = Math.max(maxX - minX, maxY - minY);
-    invSize = invSize !== 0 ? 1 / invSize : 0;
+    invSize = invSize !== 0 ? 32767 / invSize : 0;
   }
 
-  earcutLinked(outerNode, triangles, dim, minX, minY, invSize);
+  earcutLinked(outerNode, triangles, dim, minX, minY, invSize, 0);
   return triangles;
 } // create a circular doubly linked list from polygon points in the specified winding order
 
@@ -99,9 +99,9 @@ function earcutLinked(ear, triangles, dim, minX, minY, invSize, pass) {
 
     if (invSize ? isEarHashed(ear, minX, minY, invSize) : isEar(ear)) {
       // cut off the triangle
-      triangles.push(prev.i / dim);
-      triangles.push(ear.i / dim);
-      triangles.push(next.i / dim);
+      triangles.push(prev.i / dim | 0);
+      triangles.push(ear.i / dim | 0);
+      triangles.push(next.i / dim | 0);
       removeNode(ear); // skipping the next vertex leads to less sliver triangles
 
       ear = next.next;
@@ -135,10 +135,21 @@ function isEar(ear) {
   if (area(a, b, c) >= 0) return false; // reflex, can't be an ear
   // now make sure we don't have other points inside the potential ear
 
-  var p = ear.next.next;
+  var ax = a.x,
+      bx = b.x,
+      cx = c.x,
+      ay = a.y,
+      by = b.y,
+      cy = c.y; // triangle bbox; min & max are calculated like this for speed
 
-  while (p !== ear.prev) {
-    if (pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) && area(p.prev, p, p.next) >= 0) return false;
+  var x0 = ax < bx ? ax < cx ? ax : cx : bx < cx ? bx : cx,
+      y0 = ay < by ? ay < cy ? ay : cy : by < cy ? by : cy,
+      x1 = ax > bx ? ax > cx ? ax : cx : bx > cx ? bx : cx,
+      y1 = ay > by ? ay > cy ? ay : cy : by > cy ? by : cy;
+  var p = c.next;
+
+  while (p !== a) {
+    if (p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1 && pointInTriangle(ax, ay, bx, by, cx, cy, p.x, p.y) && area(p.prev, p, p.next) >= 0) return false;
     p = p.next;
   }
 
@@ -150,34 +161,40 @@ function isEarHashed(ear, minX, minY, invSize) {
       b = ear,
       c = ear.next;
   if (area(a, b, c) >= 0) return false; // reflex, can't be an ear
-  // triangle bbox; min & max are calculated like this for speed
 
-  var minTX = a.x < b.x ? a.x < c.x ? a.x : c.x : b.x < c.x ? b.x : c.x,
-      minTY = a.y < b.y ? a.y < c.y ? a.y : c.y : b.y < c.y ? b.y : c.y,
-      maxTX = a.x > b.x ? a.x > c.x ? a.x : c.x : b.x > c.x ? b.x : c.x,
-      maxTY = a.y > b.y ? a.y > c.y ? a.y : c.y : b.y > c.y ? b.y : c.y; // z-order range for the current triangle bbox;
+  var ax = a.x,
+      bx = b.x,
+      cx = c.x,
+      ay = a.y,
+      by = b.y,
+      cy = c.y; // triangle bbox; min & max are calculated like this for speed
 
-  var minZ = zOrder(minTX, minTY, minX, minY, invSize),
-      maxZ = zOrder(maxTX, maxTY, minX, minY, invSize);
+  var x0 = ax < bx ? ax < cx ? ax : cx : bx < cx ? bx : cx,
+      y0 = ay < by ? ay < cy ? ay : cy : by < cy ? by : cy,
+      x1 = ax > bx ? ax > cx ? ax : cx : bx > cx ? bx : cx,
+      y1 = ay > by ? ay > cy ? ay : cy : by > cy ? by : cy; // z-order range for the current triangle bbox;
+
+  var minZ = zOrder(x0, y0, minX, minY, invSize),
+      maxZ = zOrder(x1, y1, minX, minY, invSize);
   var p = ear.prevZ,
       n = ear.nextZ; // look for points inside the triangle in both directions
 
   while (p && p.z >= minZ && n && n.z <= maxZ) {
-    if (p !== ear.prev && p !== ear.next && pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) && area(p.prev, p, p.next) >= 0) return false;
+    if (p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1 && p !== a && p !== c && pointInTriangle(ax, ay, bx, by, cx, cy, p.x, p.y) && area(p.prev, p, p.next) >= 0) return false;
     p = p.prevZ;
-    if (n !== ear.prev && n !== ear.next && pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) && area(n.prev, n, n.next) >= 0) return false;
+    if (n.x >= x0 && n.x <= x1 && n.y >= y0 && n.y <= y1 && n !== a && n !== c && pointInTriangle(ax, ay, bx, by, cx, cy, n.x, n.y) && area(n.prev, n, n.next) >= 0) return false;
     n = n.nextZ;
   } // look for remaining points in decreasing z-order
 
 
   while (p && p.z >= minZ) {
-    if (p !== ear.prev && p !== ear.next && pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) && area(p.prev, p, p.next) >= 0) return false;
+    if (p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1 && p !== a && p !== c && pointInTriangle(ax, ay, bx, by, cx, cy, p.x, p.y) && area(p.prev, p, p.next) >= 0) return false;
     p = p.prevZ;
   } // look for remaining points in increasing z-order
 
 
   while (n && n.z <= maxZ) {
-    if (n !== ear.prev && n !== ear.next && pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) && area(n.prev, n, n.next) >= 0) return false;
+    if (n.x >= x0 && n.x <= x1 && n.y >= y0 && n.y <= y1 && n !== a && n !== c && pointInTriangle(ax, ay, bx, by, cx, cy, n.x, n.y) && area(n.prev, n, n.next) >= 0) return false;
     n = n.nextZ;
   }
 
@@ -193,9 +210,9 @@ function cureLocalIntersections(start, triangles, dim) {
         b = p.next.next;
 
     if (!equals(a, b) && intersects(a, p, p.next, b) && locallyInside(a, b) && locallyInside(b, a)) {
-      triangles.push(a.i / dim);
-      triangles.push(p.i / dim);
-      triangles.push(b.i / dim); // remove two nodes involved
+      triangles.push(a.i / dim | 0);
+      triangles.push(p.i / dim | 0);
+      triangles.push(b.i / dim | 0); // remove two nodes involved
 
       removeNode(p);
       removeNode(p.next);
@@ -224,8 +241,8 @@ function splitEarcut(start, triangles, dim, minX, minY, invSize) {
         a = filterPoints(a, a.next);
         c = filterPoints(c, c.next); // run earcut on each half
 
-        earcutLinked(a, triangles, dim, minX, minY, invSize);
-        earcutLinked(c, triangles, dim, minX, minY, invSize);
+        earcutLinked(a, triangles, dim, minX, minY, invSize, 0);
+        earcutLinked(c, triangles, dim, minX, minY, invSize, 0);
         return;
       }
 
@@ -257,7 +274,6 @@ function eliminateHoles(data, holeIndices, outerNode, dim) {
 
   for (i = 0; i < queue.length; i++) {
     outerNode = eliminateHole(queue[i], outerNode);
-    outerNode = filterPoints(outerNode, outerNode.next);
   }
 
   return outerNode;
@@ -277,10 +293,8 @@ function eliminateHole(hole, outerNode) {
 
   var bridgeReverse = splitPolygon(bridge, hole); // filter collinear points around the cuts
 
-  var filteredBridge = filterPoints(bridge, bridge.next);
-  filterPoints(bridgeReverse, bridgeReverse.next); // Check if input node was removed by the filtering
-
-  return outerNode === bridge ? filteredBridge : outerNode;
+  filterPoints(bridgeReverse, bridgeReverse.next);
+  return filterPoints(bridge, bridge.next);
 } // David Eberly's algorithm for finding a bridge between hole and outer polygon
 
 
@@ -298,22 +312,15 @@ function findHoleBridge(hole, outerNode) {
 
       if (x <= hx && x > qx) {
         qx = x;
-
-        if (x === hx) {
-          if (hy === p.y) return p;
-          if (hy === p.next.y) return p.next;
-        }
-
         m = p.x < p.next.x ? p : p.next;
+        if (x === hx) return m; // hole touches outer segment; pick leftmost endpoint
       }
     }
 
     p = p.next;
   } while (p !== outerNode);
 
-  if (!m) return null;
-  if (hx === qx) return m; // hole touches outer segment; pick leftmost endpoint
-  // look for points inside the triangle of hole point, segment intersection and endpoint;
+  if (!m) return null; // look for points inside the triangle of hole point, segment intersection and endpoint;
   // if there are no points found, we have a valid connection;
   // otherwise choose the point of the minimum angle with the ray as connection point
 
@@ -350,7 +357,7 @@ function indexCurve(start, minX, minY, invSize) {
   var p = start;
 
   do {
-    if (p.z === null) p.z = zOrder(p.x, p.y, minX, minY, invSize);
+    if (p.z === 0) p.z = zOrder(p.x, p.y, minX, minY, invSize);
     p.prevZ = p.prev;
     p.nextZ = p.next;
     p = p.next;
@@ -422,8 +429,8 @@ function sortLinked(list) {
 
 function zOrder(x, y, minX, minY, invSize) {
   // coords are transformed into non-negative 15-bit integer range
-  x = 32767 * (x - minX) * invSize;
-  y = 32767 * (y - minY) * invSize;
+  x = (x - minX) * invSize | 0;
+  y = (y - minY) * invSize | 0;
   x = (x | x << 8) & 0x00FF00FF;
   x = (x | x << 4) & 0x0F0F0F0F;
   x = (x | x << 2) & 0x33333333;
@@ -450,7 +457,7 @@ function getLeftmost(start) {
 
 
 function pointInTriangle(ax, ay, bx, by, cx, cy, px, py) {
-  return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0 && (ax - px) * (by - py) - (bx - px) * (ay - py) >= 0 && (bx - px) * (cy - py) - (cx - px) * (by - py) >= 0;
+  return (cx - px) * (ay - py) >= (ax - px) * (cy - py) && (ax - px) * (by - py) >= (bx - px) * (ay - py) && (bx - px) * (cy - py) >= (cx - px) * (by - py);
 } // check if a diagonal between two polygon nodes is valid (lies in polygon interior)
 
 
@@ -583,7 +590,7 @@ function Node(i, x, y) {
   this.prev = null;
   this.next = null; // z-order curve value
 
-  this.z = null; // previous and next nodes in z-order
+  this.z = 0; // previous and next nodes in z-order
 
   this.prevZ = null;
   this.nextZ = null; // indicates whether this is a steiner point
@@ -1329,4 +1336,122 @@ function leftOnLine(p, p1, p2) {
   return (y1 - y2) * x + (x2 - x1) * y + x1 * y2 - x2 * y1 > 0;
 }
 
-export { expandLine, extrudePolygons, extrudePolylines };
+function cylinder(point, options) {
+  if (options === void 0) {
+    options = {};
+  }
+
+  options = Object.assign({}, {
+    radius: 1,
+    height: 2,
+    radialSegments: 6
+  }, options);
+  var radialSegments = Math.round(Math.max(4, options.radialSegments));
+  var _options = options,
+      radius = _options.radius,
+      height = _options.height;
+  var aRad = 360 / radialSegments / 360 * Math.PI * 2;
+  var circlePointsLen = radialSegments + 1;
+  var points = new Float32Array(circlePointsLen * 3 * 2);
+  var centerx = point[0],
+      centery = point[1];
+  var idx = 0,
+      uIdx = 0;
+  var offset = circlePointsLen * 3,
+      uOffset = circlePointsLen * 2;
+  var indices = [],
+      uvs = [];
+
+  for (var i = -1; i < radialSegments; i++) {
+    var rad = aRad * i;
+    var x = Math.cos(rad) * radius + centerx,
+        y = Math.sin(rad) * radius + centery; // bottom vertices
+
+    points[idx] = x;
+    points[idx + 1] = y;
+    points[idx + 2] = 0; // top vertices
+
+    points[idx + offset] = x;
+    points[idx + 1 + offset] = y;
+    points[idx + 2 + offset] = height;
+    var u = 0,
+        v = 0;
+    u = 0.5 + x / radius / 2;
+    v = 0.5 + y / radius / 2;
+    uvs[uIdx] = u;
+    uvs[uIdx + 1] = v;
+    uvs[uIdx + uOffset] = u;
+    uvs[uIdx + 1 + uOffset] = v;
+    idx += 3;
+    uIdx += 2;
+
+    if (i > 1) {
+      // bottom indices
+      indices.push(0, i - 1, i);
+    }
+  }
+
+  idx -= 3;
+  points[idx] = points[0];
+  points[idx + 1] = points[1];
+  points[idx + 2] = points[2];
+  var pointsLen = points.length;
+  points[pointsLen - 3] = points[0];
+  points[pointsLen - 2] = points[1];
+  points[pointsLen - 1] = height;
+  var indicesLen = indices.length; // top indices
+
+  for (var _i = 0; _i < indicesLen; _i++) {
+    var index = indices[_i];
+    indices.push(index + circlePointsLen);
+  }
+
+  var sidePoints = new Float32Array((circlePointsLen * 3 * 2 - 6) * 2);
+  var pIndex = -1;
+  idx = circlePointsLen * 2;
+  uIdx = 0;
+
+  for (var _i2 = 0, len = points.length / 2; _i2 < len - 3; _i2 += 3) {
+    var x1 = points[_i2],
+        y1 = points[_i2 + 1],
+        x2 = points[_i2 + 3],
+        y2 = points[_i2 + 4];
+    sidePoints[++pIndex] = x1;
+    sidePoints[++pIndex] = y1;
+    sidePoints[++pIndex] = height;
+    sidePoints[++pIndex] = x2;
+    sidePoints[++pIndex] = y2;
+    sidePoints[++pIndex] = height;
+    sidePoints[++pIndex] = x1;
+    sidePoints[++pIndex] = y1;
+    sidePoints[++pIndex] = 0;
+    sidePoints[++pIndex] = x2;
+    sidePoints[++pIndex] = y2;
+    sidePoints[++pIndex] = 0;
+    var a = idx + 2,
+        b = idx + 3,
+        c = idx,
+        d = idx + 1; // indices.push(a, c, b, c, d, b);
+
+    indices.push(c, a, d, a, b, d);
+    idx += 4;
+    var u1 = uIdx / circlePointsLen,
+        u2 = (uIdx + 1) / circlePointsLen;
+    uvs.push(u1, height / radius / 2, u2, height / radius / 2, u1, 0, u2, 0);
+    uIdx++;
+  }
+
+  var position = new Float32Array(points.length + sidePoints.length);
+  position.set(points, 0);
+  position.set(sidePoints, points.length);
+  var normal = generateNormal(indices, position);
+  return {
+    points: points,
+    indices: new Uint32Array(indices),
+    position: position,
+    normal: normal,
+    uv: new Float32Array(uvs)
+  };
+}
+
+export { cylinder, expandLine, extrudePolygons, extrudePolylines };
