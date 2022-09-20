@@ -26,29 +26,29 @@ function generateTopAndBottom(result, options) {
     while (i < len) {
         // top left
         const idx0 = i * 3;
-        const [x1, y1] = leftPoints[i];
+        const [x1, y1, z1] = leftPoints[i];
         points[idx0] = x1;
         points[idx0 + 1] = y1;
-        points[idx0 + 2] = z;
+        points[idx0 + 2] = z + z1;
 
         // top right
-        const [x2, y2] = rightPoints[i];
+        const [x2, y2, z2] = rightPoints[i];
         const idx1 = len * 3 + idx0;
         points[idx1] = x2;
         points[idx1 + 1] = y2;
-        points[idx1 + 2] = z;
+        points[idx1 + 2] = z + z2;
 
         // bottom left
         const idx2 = (len * 2) * 3 + idx0;
         points[idx2] = x1;
         points[idx2 + 1] = y1;
-        points[idx2 + 2] = 0;
+        points[idx2 + 2] = z1;
 
         // bottom right
         const idx3 = (len * 2) * 3 + len * 3 + idx0;
         points[idx3] = x2;
         points[idx3 + 1] = y2;
-        points[idx3 + 2] = 0;
+        points[idx3 + 2] = z2;
 
         i++;
     }
@@ -88,7 +88,7 @@ function generateSides(result, options) {
 
     function addOneSideIndex(v1, v2) {
         const idx = points.length / 3;
-        points.push(v1[0], v1[1], z, v2[0], v2[1], z, v1[0], v1[1], 0, v2[0], v2[1], 0);
+        points.push(v1[0], v1[1], z + v1[2], v2[0], v2[1], z + v2[2], v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
         const a = idx + 2, b = idx + 3, c = idx, d = idx + 1;
         index.push(a, c, b, c, d, b);
         generateSideWallUV(uvs, points, a, b, c, d);
@@ -180,11 +180,12 @@ export function expandLine(line, options) {
 
 function calOffsetPoint(rad, radius, p) {
     const [x, y] = p;
+    const z = p[2] || 0;
     const x1 = Math.cos(rad) * radius, y1 = Math.sin(rad) * radius;
-    const p1 = [x + x1, y + y1];
+    const p1 = [x + x1, y + y1, z];
     const rad1 = rad += Math.PI;
     const x2 = Math.cos(rad1) * radius, y2 = Math.sin(rad1) * radius;
-    const p2 = [x + x2, y + y2];
+    const p2 = [x + x2, y + y2, z];
     return [p1, p2];
 }
 

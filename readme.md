@@ -18,6 +18,10 @@ Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks
 ![](./gallery/ny-building.png)
 [cylinder](https://deyihu.github.io/poly-extrude/test/cylinder.html)<br>
 ![](./gallery/cylinder.png)
+[brige](https://deyihu.github.io/poly-extrude/test/brige.html)<br>
+![](./gallery/brige.png)
+[spring](https://deyihu.github.io/poly-extrude/test/spring.html)<br>
+![](./gallery/spring.png)
 
 ## Install
 
