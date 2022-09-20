@@ -1,5 +1,5 @@
 /*!
- * poly-extrude v0.1.0
+ * poly-extrude v0.2.0
   */
 var earcut$2 = {exports: {}};
 
@@ -1101,28 +1101,30 @@ function generateTopAndBottom(result, options) {
     var idx0 = i * 3;
     var _leftPoints$i = leftPoints[i],
         x1 = _leftPoints$i[0],
-        y1 = _leftPoints$i[1];
+        y1 = _leftPoints$i[1],
+        z1 = _leftPoints$i[2];
     points[idx0] = x1;
     points[idx0 + 1] = y1;
-    points[idx0 + 2] = z; // top right
+    points[idx0 + 2] = z + z1; // top right
 
     var _rightPoints$i = rightPoints[i],
         x2 = _rightPoints$i[0],
-        y2 = _rightPoints$i[1];
+        y2 = _rightPoints$i[1],
+        z2 = _rightPoints$i[2];
     var idx1 = len * 3 + idx0;
     points[idx1] = x2;
     points[idx1 + 1] = y2;
-    points[idx1 + 2] = z; // bottom left
+    points[idx1 + 2] = z + z2; // bottom left
 
     var idx2 = len * 2 * 3 + idx0;
     points[idx2] = x1;
     points[idx2 + 1] = y1;
-    points[idx2 + 2] = 0; // bottom right
+    points[idx2 + 2] = z1; // bottom right
 
     var idx3 = len * 2 * 3 + len * 3 + idx0;
     points[idx3] = x2;
     points[idx3 + 1] = y2;
-    points[idx3 + 2] = 0;
+    points[idx3 + 2] = z2;
     i++;
   }
 
@@ -1176,7 +1178,7 @@ function generateSides(result, options) {
 
   function addOneSideIndex(v1, v2) {
     var idx = points.length / 3;
-    points.push(v1[0], v1[1], z, v2[0], v2[1], z, v1[0], v1[1], 0, v2[0], v2[1], 0);
+    points.push(v1[0], v1[1], z + v1[2], v2[0], v2[1], z + v2[2], v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
     var a = idx + 2,
         b = idx + 3,
         c = idx,
@@ -1305,13 +1307,14 @@ function expandLine(line, options) {
 function calOffsetPoint(rad, radius, p) {
   var x = p[0],
       y = p[1];
+  var z = p[2] || 0;
   var x1 = Math.cos(rad) * radius,
       y1 = Math.sin(rad) * radius;
-  var p1 = [x + x1, y + y1];
+  var p1 = [x + x1, y + y1, z];
   var rad1 = rad += Math.PI;
   var x2 = Math.cos(rad1) * radius,
       y2 = Math.sin(rad1) * radius;
-  var p2 = [x + x2, y + y2];
+  var p2 = [x + x2, y + y2, z];
   return [p1, p2];
 }
 
