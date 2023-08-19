@@ -22,6 +22,8 @@ Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks
 ![](./gallery/brige.png)
 [spring](https://deyihu.github.io/poly-extrude/test/spring.html)<br>
 ![](./gallery/spring.png)
+[expand paths](https://deyihu.github.io/poly-extrude/test/expand-paths-brige.html)<br>
+![](./gallery/expand-paths-brige.png)
 
 ## Install
 
@@ -45,7 +47,8 @@ pnpm i poly-extrude
   import {
       extrudePolygons,
       extrudePolylines,
-      cylinder
+      cylinder,
+      expandPaths
   } from 'poly-extrude';
   const polygons = [
       //polygon
@@ -116,6 +119,34 @@ pnpm i poly-extrude
       indices
   } = result;
   //do something
+
+
+  
+  const polylines = [
+      // polyline
+      [
+          [x, y],
+          [x, y], ...........
+      ],
+      //polyline
+      [
+          [x, y],
+          [x, y], ...........
+      ],
+  ];
+
+  const result = expandPaths(polylines, {
+      cornerRadius: 0.5,
+      lineWidth: 2
+  });
+  const {
+      positon,
+      normal,
+      uv,
+      indices
+  } = result;
+  //do something
+
 ```
 
 ### CDN
@@ -193,5 +224,32 @@ pnpm i poly-extrude
         indices
     } = result;
     //do something
+
+
+    
+  const polylines = [
+      // polyline
+      [
+          [x, y],
+          [x, y], ...........
+      ],
+      //polyline
+      [
+          [x, y],
+          [x, y], ...........
+      ],
+  ];
+
+  const result = polyextrude.expandPaths(polylines, {
+      cornerRadius: 0.5,
+      lineWidth: 2
+  });
+  const {
+      positon,
+      normal,
+      uv,
+      indices
+  } = result;
+  //do something
 </script>
 ```
