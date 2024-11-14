@@ -7,7 +7,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/**/*.js",
-    "build": "npm run lint && cross-env NODE_ENV=dev  rollup -c"
+    "build": "npm run lint && cross-env NODE_ENV=dev  rollup -c",
+    "dev": "npm run lint && cross-env NODE_ENV=dev  rollup -c -w"
   },
   "repository": {
     "type": "git",
