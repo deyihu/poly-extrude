@@ -122,24 +122,31 @@ function generateSides(result, options) {
 const TEMPV1 = { x: 0, y: 0 }, TEMPV2 = { x: 0, y: 0 };
 
 export function expandLine(line, options) {
-    let preAngle = 0;
+    // let preAngle = 0;
     const radius = options.lineWidth / 2;
     const points = [], leftPoints = [], rightPoints = [];
     const len = line.length;
     let i = 0;
-    while (i < len - 1) {
-        const p1 = line[i],
+    while (i < len) {
+        let p1 = line[i],
             p2 = line[i + 1];
+        const currentp = line[i];
+        // last vertex
+        if (i === len - 1) {
+            p1 = line[len - 2];
+            p2 = line[len - 1];
+        }
         const dy = p2[1] - p1[1],
             dx = p2[0] - p1[0];
         let rAngle = 0;
         const rad = Math.atan(dy / dx);
         const angle = radToDeg(rad);
-        preAngle = angle;
-        if (i === 0) {
+        // preAngle = angle;
+        if (i === 0 || i === len - 1) {
             rAngle = angle;
             rAngle -= 90;
         } else {
+            // 至少3个顶点才会触发
             const p0 = line[i - 1];
             TEMPV1.x = p0[0] - p1[0];
             TEMPV1.y = p0[1] - p1[1];
@@ -149,7 +156,26 @@ export function expandLine(line, options) {
             rAngle = angle - vAngle / 2;
         }
         const rRad = degToRad(rAngle);
-        const [op1, op2] = calOffsetPoint(rRad, radius, p1);
+        const p3 = currentp;
+        const x = Math.cos(rRad) + p3[0], y = Math.sin(rRad) + p3[1];
+        const p4 = [x, y];
+        const [line1, line2] = translateLine(p1, p2, radius);
+        let op1 = lineIntersection(line1[0], line1[1], p3, p4);
+        let op2 = lineIntersection(line2[0], line2[1], p3, p4);
+        // 平行，回头路
+        if (!op1 || !op2) {
+            const len1 = points.length;
+            const point1 = points[len1 - 2];
+            const point2 = points[len1 - 1];
+            if (!point1 || !point2) {
+                continue;
+            }
+            op1 = [point1[0], point1[1]];
+            op2 = [point2[0], point2[1]];
+        }
+        op1[2] = currentp[2] || 0;
+        op2[2] = currentp[2] || 0;
+        // const [op1, op2] = calOffsetPoint(rRad, radius, p1);
         points.push(op1, op2);
         if (leftOnLine(op1, p1, p2)) {
             leftPoints.push(op1);
@@ -160,24 +186,11 @@ export function expandLine(line, options) {
         }
         i++;
     }
-    let rAngle = preAngle;
-    rAngle -= 90;
-    const rRad = degToRad(rAngle);
-    const p1 = line[len - 2];
-    const p2 = line[len - 1];
-    const [op1, op2] = calOffsetPoint(rRad, radius, p2);
-    points.push(op1, op2);
-    if (leftOnLine(op1, p1, p2)) {
-        leftPoints.push(op1);
-        rightPoints.push(op2);
-    } else {
-        leftPoints.push(op2);
-        rightPoints.push(op1);
-    }
 
     return { offsetPoints: points, leftPoints, rightPoints };
 }
 
+// eslint-disable-next-line no-unused-vars
 function calOffsetPoint(rad, radius, p) {
     const [x, y] = p;
     const z = p[2] || 0;
@@ -201,4 +214,71 @@ function leftOnLine(p, p1, p2) {
     const [x2, y2] = p2;
     const [x, y] = p;
     return (y1 - y2) * x + (x2 - x1) * y + x1 * y2 - x2 * y1 > 0;
+}
+
+/**
+ * 平移线
+ * @param {*} p1
+ * @param {*} p2
+ * @param {*} distance
+ * @returns
+ */
+function translateLine(p1, p2, distance) {
+    const dy = p2[1] - p1[1], dx = p2[0] - p1[0];
+    const rad = Math.atan2(dy, dx);
+    const rad1 = rad + Math.PI / 2;
+    let offsetX = Math.cos(rad1) * distance, offsetY = Math.sin(rad1) * distance;
+    const tp1 = [p1[0] + offsetX, p1[1] + offsetY];
+    const tp2 = [p2[0] + offsetX, p2[1] + offsetY];
+    const rad2 = rad - Math.PI / 2;
+    offsetX = Math.cos(rad2) * distance;
+    offsetY = Math.sin(rad2) * distance;
+    const tp3 = [p1[0] + offsetX, p1[1] + offsetY];
+    const tp4 = [p2[0] + offsetX, p2[1] + offsetY];
+    return [[tp1, tp2], [tp3, tp4]];
+}
+
+/**
+ * 直线交点
+ * @param {*} p1
+ * @param {*} p2
+ * @param {*} p3
+ * @param {*} p4
+ * @returns
+ */
+function lineIntersection(p1, p2, p3, p4) {
+    const dx1 = p2[0] - p1[0], dy1 = p2[1] - p1[1];
+    const dx2 = p4[0] - p3[0], dy2 = p4[1] - p3[1];
+    if (dx1 === 0 && dx2 === 0) {
+        return null;
+    }
+    if (dy1 === 0 && dy2 === 0) {
+        return null;
+    }
+
+    const k1 = dy1 / dx1;
+    const k2 = dy2 / dx2;
+
+    const b1 = p1[1] - k1 * p1[0];
+    const b2 = p3[1] - k2 * p3[0];
+
+    let x, y;
+
+    if (dx1 === 0) {
+        x = p1[0];
+        y = k2 * x + b2;
+    } else if (dx2 === 0) {
+        x = p3[0];
+        y = k1 * x + b1;
+    } else if (dy1 === 0) {
+        y = p1[1];
+        x = (y - b2) / k2;
+    } else if (dy2 === 0) {
+        y = p3[1];
+        x = (y - b1) / k1;
+    } else {
+        x = (b2 - b1) / (k1 - k2);
+        y = k1 * x + b1;
+    }
+    return [x, y];
 }
