@@ -18,8 +18,49 @@ export function extrudePolylines(lines, options) {
     return result;
 }
 
+export function extrudeSlopes(lines, options) {
+    options = Object.assign({}, { depth: 2, lineWidth: 1, side: 'left', sideDepth: 0 }, options);
+    const { depth, side, sideDepth } = options;
+    const results = lines.map(line => {
+        const tempResult = expandLine(line, options);
+        tempResult.line = line;
+        const { leftPoints, rightPoints } = tempResult;
+        const result = { line };
+        let depths;
+        for (let i = 0, len = line.length; i < len; i++) {
+            line[i][2] = line[i][2] || 0;
+        }
+        if (side === 'left') {
+            result.leftPoints = leftPoints;
+            result.rightPoints = line;
+            depths = [sideDepth, depth];
+        } else {
+            result.leftPoints = line;
+            result.rightPoints = rightPoints;
+            depths = [depth, sideDepth];
+        }
+        result.depths = depths;
+        generateTopAndBottom(result, options);
+        generateSides(result, options);
+        result.position = new Float32Array(result.points);
+        result.indices = new Uint32Array(result.index);
+        result.uv = new Float32Array(result.uvs);
+        result.normal = generateNormal(result.indices, result.position);
+        return result;
+    });
+    const result = merge(results);
+    result.lines = lines;
+    return result;
+}
+
 function generateTopAndBottom(result, options) {
     const z = options.depth;
+    const depths = result.depths;
+    let lz = z, rz = z;
+    if (depths) {
+        lz = depths[0];
+        rz = depths[1];
+    }
     const points = [], index = [], uvs = [];
     const { leftPoints, rightPoints } = result;
     let i = 0, len = leftPoints.length;
@@ -29,14 +70,14 @@ function generateTopAndBottom(result, options) {
         const [x1, y1, z1] = leftPoints[i];
         points[idx0] = x1;
         points[idx0 + 1] = y1;
-        points[idx0 + 2] = z + z1;
+        points[idx0 + 2] = lz + z1;
 
         // top right
         const [x2, y2, z2] = rightPoints[i];
         const idx1 = len * 3 + idx0;
         points[idx1] = x2;
         points[idx1 + 1] = y2;
-        points[idx1 + 2] = z + z2;
+        points[idx1 + 2] = rz + z2;
 
         // bottom left
         const idx2 = (len * 2) * 3 + idx0;
@@ -79,16 +120,26 @@ function generateTopAndBottom(result, options) {
     result.index = index;
     result.points = points;
     result.uvs = uvs;
+    if (depths) {
+        len = leftPoints.length;
+        i = 0;
+        while (i < len) {
+            leftPoints[i].depth = lz;
+            rightPoints[i].depth = rz;
+            i++;
+        }
+    }
 }
 
 function generateSides(result, options) {
     const { points, index, leftPoints, rightPoints, uvs } = result;
     const z = options.depth;
     const rings = [leftPoints, rightPoints];
+    const depthsEnable = result.depths;
 
     function addOneSideIndex(v1, v2) {
         const idx = points.length / 3;
-        points.push(v1[0], v1[1], z + v1[2], v2[0], v2[1], z + v2[2], v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+        points.push(v1[0], v1[1], (depthsEnable ? v1.depth : z) + v1[2], v2[0], v2[1], (depthsEnable ? v2.depth : z) + v2[2], v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
         const a = idx + 2, b = idx + 3, c = idx, d = idx + 1;
         index.push(a, c, b, c, d, b);
         generateSideWallUV(uvs, points, a, b, c, d);
@@ -209,7 +260,7 @@ const getAngle = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => {
     return (angle + 360) % 360;
 };
 
-function leftOnLine(p, p1, p2) {
+export function leftOnLine(p, p1, p2) {
     const [x1, y1] = p1;
     const [x2, y2] = p2;
     const [x, y] = p;
