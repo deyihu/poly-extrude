@@ -1,29 +1,30 @@
 # poly-extrude
 
-
 Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks/maptalks.three) project<br>
 
 ## Examples
-[building](https://deyihu.github.io/poly-extrude/test/building.html)<br>
-![](./gallery/building.png)<br>
-[buildings](https://deyihu.github.io/poly-extrude/test/buildings.html)<br>
-![](./gallery/buildings.png)<br>
+
+[building](https://deyihu.github.io/poly-extrude/test/building.html)
+<!-- ![](./gallery/building.png)<br> -->
+[buildings](https://deyihu.github.io/poly-extrude/test/buildings.html)
+<!-- ![](./gallery/buildings.png)<br> -->
 [multi-polygon](https://deyihu.github.io/poly-extrude/test/multi-polygon.html)<br>
-![](./gallery/multi-polygon.png)<br>
+<!-- ![](./gallery/multi-polygon.png)<br> -->
 [street](https://deyihu.github.io/poly-extrude/test/street.html)<br>
-![](./gallery/street.png)<br>
+<!-- ![](./gallery/street.png)<br> -->
 [line-uv](https://deyihu.github.io/poly-extrude/test/line-uv.html)<br>
-![](./gallery/line-uv.png)
+<!-- ![](./gallery/line-uv.png) -->
 [ny-building](https://deyihu.github.io/poly-extrude/test/ny-building.html)<br>
-![](./gallery/ny-building.png)
+<!-- ![](./gallery/ny-building.png) -->
 [cylinder](https://deyihu.github.io/poly-extrude/test/cylinder.html)<br>
-![](./gallery/cylinder.png)
+<!-- ![](./gallery/cylinder.png) -->
 [brige](https://deyihu.github.io/poly-extrude/test/brige.html)<br>
-![](./gallery/brige.png)
+<!-- ![](./gallery/brige.png) -->
 [spring](https://deyihu.github.io/poly-extrude/test/spring.html)<br>
-![](./gallery/spring.png)
+<!-- ![](./gallery/spring.png) -->
 [expand paths](https://deyihu.github.io/poly-extrude/test/expand-paths-brige.html)<br>
-![](./gallery/expand-paths-brige.png)
+<!-- ![](./gallery/expand-paths-brige.png) -->
+[slope](https://deyihu.github.io/poly-extrude/test/slope.html)<br>
 
 ## Install
 
@@ -48,7 +49,8 @@ pnpm i poly-extrude
       extrudePolygons,
       extrudePolylines,
       cylinder,
-      expandPaths
+      expandPaths,
+      extrudeSlopes
   } from 'poly-extrude';
   const polygons = [
       //polygon
@@ -120,8 +122,6 @@ pnpm i poly-extrude
   } = result;
   //do something
 
-
-  
   const polylines = [
       // polyline
       [
@@ -147,6 +147,32 @@ pnpm i poly-extrude
   } = result;
   //do something
 
+  const polylines = [
+      // polyline
+      [
+          [x, y],
+          [x, y], ...........
+      ],
+      //polyline
+      [
+          [x, y],
+          [x, y], ...........
+      ],
+  ];
+
+  const result = extrudeSlopes(polylines, {
+      depth: 1,
+      side: 'left',
+      sideDepth: 0,
+      lineWidth: 2
+  });
+  const {
+      positon,
+      normal,
+      uv,
+      indices
+  } = result;
+  //do something
 ```
 
 ### CDN
@@ -225,9 +251,32 @@ pnpm i poly-extrude
     } = result;
     //do something
 
+    const polylines = [
+        // polyline
+        [
+            [x, y],
+            [x, y], ...........
+        ],
+        //polyline
+        [
+            [x, y],
+            [x, y], ...........
+        ],
+    ];
 
-    
-  const polylines = [
+    const result = polyextrude.expandPaths(polylines, {
+        cornerRadius: 0.5,
+        lineWidth: 2
+    });
+    const {
+        positon,
+        normal,
+        uv,
+        indices
+    } = result;
+    //do something
+
+     const polylines = [
       // polyline
       [
           [x, y],
@@ -240,8 +289,10 @@ pnpm i poly-extrude
       ],
   ];
 
-  const result = polyextrude.expandPaths(polylines, {
-      cornerRadius: 0.5,
+  const result = polyextrude.extrudeSlopes(polylines, {
+      depth: 1,
+      side: 'left',
+      sideDepth: 0,
       lineWidth: 2
   });
   const {
