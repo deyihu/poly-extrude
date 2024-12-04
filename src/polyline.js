@@ -1,7 +1,14 @@
 import { degToRad, generateNormal, generateSideWallUV, merge, radToDeg } from './util';
 
+function checkOptions(options) {
+    options.lineWidth = Math.max(0, options.lineWidth);
+    options.depth = Math.max(0, options.depth);
+    options.sideDepth = Math.max(0, options.sideDepth);
+}
+
 export function extrudePolylines(lines, options) {
-    options = Object.assign({}, { depth: 2, lineWidth: 1 }, options);
+    options = Object.assign({}, { depth: 2, lineWidth: 1, bottomStickGround: false }, options);
+    checkOptions(options);
     const results = lines.map(line => {
         const result = expandLine(line, options);
         result.line = line;
@@ -19,7 +26,8 @@ export function extrudePolylines(lines, options) {
 }
 
 export function extrudeSlopes(lines, options) {
-    options = Object.assign({}, { depth: 2, lineWidth: 1, side: 'left', sideDepth: 0 }, options);
+    options = Object.assign({}, { depth: 2, lineWidth: 1, side: 'left', sideDepth: 0, bottomStickGround: false }, options);
+    checkOptions(options);
     const { depth, side, sideDepth } = options;
     const results = lines.map(line => {
         const tempResult = expandLine(line, options);
@@ -54,6 +62,7 @@ export function extrudeSlopes(lines, options) {
 }
 
 function generateTopAndBottom(result, options) {
+    const bottomStickGround = options.bottomStickGround;
     const z = options.depth;
     const depths = result.depths;
     let lz = z, rz = z;
@@ -84,12 +93,18 @@ function generateTopAndBottom(result, options) {
         points[idx2] = x1;
         points[idx2 + 1] = y1;
         points[idx2 + 2] = z1;
+        if (bottomStickGround) {
+            points[idx2 + 2] = 0;
+        }
 
         // bottom right
         const idx3 = (len * 2) * 3 + len * 3 + idx0;
         points[idx3] = x2;
         points[idx3 + 1] = y2;
         points[idx3 + 2] = z2;
+        if (bottomStickGround) {
+            points[idx3 + 2] = 0;
+        }
 
         i++;
     }
@@ -134,12 +149,37 @@ function generateTopAndBottom(result, options) {
 function generateSides(result, options) {
     const { points, index, leftPoints, rightPoints, uvs } = result;
     const z = options.depth;
+    const bottomStickGround = options.bottomStickGround;
     const rings = [leftPoints, rightPoints];
     const depthsEnable = result.depths;
 
     function addOneSideIndex(v1, v2) {
         const idx = points.length / 3;
-        points.push(v1[0], v1[1], (depthsEnable ? v1.depth : z) + v1[2], v2[0], v2[1], (depthsEnable ? v2.depth : z) + v2[2], v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+        let pIndex = points.length - 1;
+
+        // top
+        points[++pIndex] = v1[0];
+        points[++pIndex] = v1[1];
+        points[++pIndex] = (depthsEnable ? v1.depth : z) + v1[2];
+
+        points[++pIndex] = v2[0];
+        points[++pIndex] = v2[1];
+        points[++pIndex] = (depthsEnable ? v2.depth : z) + v2[2];
+
+        // points.push(v1[0], v1[1], (depthsEnable ? v1.depth : z) + v1[2], v2[0], v2[1], (depthsEnable ? v2.depth : z) + v2[2]);
+
+        // bottom
+
+        points[++pIndex] = v1[0];
+        points[++pIndex] = v1[1];
+        points[++pIndex] = bottomStickGround ? 0 : v1[2];
+
+        points[++pIndex] = v2[0];
+        points[++pIndex] = v2[1];
+        points[++pIndex] = bottomStickGround ? 0 : v2[2];
+
+        // points.push(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+
         const a = idx + 2, b = idx + 3, c = idx, d = idx + 1;
         index.push(a, c, b, c, d, b);
         generateSideWallUV(uvs, points, a, b, c, d);
