@@ -108,6 +108,9 @@ function createScene() {
     const ambientLight = new THREE.AmbientLight('#FFF', 0.5);
     scene.add(ambientLight);
 
+    const pointLight = new THREE.PointLight('#fff', 0.2);
+    scene.add(pointLight);
+
     //
 
     const helper = new THREE.GridHelper(200, 10);
