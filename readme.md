@@ -4,29 +4,21 @@ Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks
 
 ## Examples
 
-[building](https://deyihu.github.io/poly-extrude/test/building.html)
-<!-- ![](./gallery/building.png)<br> -->
-[buildings](https://deyihu.github.io/poly-extrude/test/buildings.html)
-<!-- ![](./gallery/buildings.png)<br> -->
-[multi-polygon](https://deyihu.github.io/poly-extrude/test/multi-polygon.html)<br>
-<!-- ![](./gallery/multi-polygon.png)<br> -->
-[street](https://deyihu.github.io/poly-extrude/test/street.html)<br>
-<!-- ![](./gallery/street.png)<br> -->
-[line-uv](https://deyihu.github.io/poly-extrude/test/line-uv.html)<br>
-<!-- ![](./gallery/line-uv.png) -->
-[ny-building](https://deyihu.github.io/poly-extrude/test/ny-building.html)<br>
-<!-- ![](./gallery/ny-building.png) -->
-[cylinder](https://deyihu.github.io/poly-extrude/test/cylinder.html)<br>
-<!-- ![](./gallery/cylinder.png) -->
-[brige](https://deyihu.github.io/poly-extrude/test/brige.html)<br>
-<!-- ![](./gallery/brige.png) -->
-[spring](https://deyihu.github.io/poly-extrude/test/spring.html)<br>
-<!-- ![](./gallery/spring.png) -->
-[expand paths](https://deyihu.github.io/poly-extrude/test/expand-paths-brige.html)<br>
-<!-- ![](./gallery/expand-paths-brige.png) -->
-[slope](https://deyihu.github.io/poly-extrude/test/slope.html)<br>
+[![](./gallery/building.png)](https://deyihu.github.io/poly-extrude/test/building.html)
 
-[tube](https://deyihu.github.io/poly-extrude/test/tube.html)<br>
+[![](./gallery/buildings.png)](https://deyihu.github.io/poly-extrude/test/buildings.html)
+
+[![](./gallery/multi-polygon.png)](https://deyihu.github.io/poly-extrude/test/multi-polygon.html)<br>
+[![](./gallery/street.png)](https://deyihu.github.io/poly-extrude/test/street.html)<br>
+[![](./gallery/line-uv.png)](https://deyihu.github.io/poly-extrude/test/line-uv.html)<br>
+[![](./gallery/ny-building.png)](https://deyihu.github.io/poly-extrude/test/ny-building.html)<br>
+[![](./gallery/cylinder.png)](https://deyihu.github.io/poly-extrude/test/cylinder.html)<br>
+[![](./gallery/brige.png)](https://deyihu.github.io/poly-extrude/test/brige.html)<br>
+[![](./gallery/spring.png)](https://deyihu.github.io/poly-extrude/test/spring.html)<br>
+[![](./gallery/expand-paths-brige.png)](https://deyihu.github.io/poly-extrude/test/expand-paths-brige.html)<br>
+[![](./gallery/slope.png)](https://deyihu.github.io/poly-extrude/test/slope.html)<br>
+
+[![](./gallery/tube.png)](https://deyihu.github.io/poly-extrude/test/tube.html)<br>
 
 ## Install
 
