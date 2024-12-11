@@ -1,3 +1,5 @@
+// code copy from https://github.com/mrdoob/three.js/blob/dev/src/math/Quaternion.js
+
 // import { clamp } from './MathUtils.js';
 
 class Quaternion {
