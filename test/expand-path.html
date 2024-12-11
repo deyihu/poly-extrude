@@ -53,7 +53,7 @@
                     const { type, coordinates } = feature.geometry;
                     const time = 'time';
                     console.time(time);
-                    const result = polyextrude.expandPaths(type === 'LineString' ? [coordinates] : coordinates, { cornerRadius: 2, lineWidth: 4 });
+                    const result = polyextrude.expandPaths(type === 'LineString' ? [coordinates] : coordinates, { cornerRadius: 0, lineWidth: 8 });
                     console.timeEnd(time);
                     console.log(result);
                     const geometry = createBufferGeometry(result);

@@ -26,23 +26,23 @@ Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks
 <!-- ![](./gallery/expand-paths-brige.png) -->
 [slope](https://deyihu.github.io/poly-extrude/test/slope.html)<br>
 
+[tube](https://deyihu.github.io/poly-extrude/test/tube.html)<br>
+
 ## Install
+
+### NPM
 
 ```sh
 npm i poly-extrude
-
-#   or
-
-yarn add poly-extrude
-
-# or
-
-pnpm i poly-extrude
 ```
 
-## API
+### CDN
 
-### ESM
+```html
+<script type="text/javascript" src="https://unpkg.com/poly-extrude/dist/poly-extrude.js"></script>
+```
+
+## Use
 
 ```js
   import {
@@ -50,15 +50,25 @@ pnpm i poly-extrude
       extrudePolylines,
       cylinder,
       expandPaths,
-      extrudeSlopes
+      extrudeSlopes,
+      expandTubes
   } from 'poly-extrude';
+
+  //if you use cdn,the namespace is polyextrude
+
+  //   const {
+  //       extrudePolygons,
+  //       extrudePolylines
+  //   } = window.polyextrude;
+
   const polygons = [
       //polygon
       [
           //outring
           [
               [x, y],
-              [x, y], ...........
+              [x, y],
+              ...........
           ],
           //holes
           [
@@ -70,7 +80,22 @@ pnpm i poly-extrude
       ],
       //other polygons
       ......
-  ]
+  ];
+
+  const polylines = [
+      // polyline
+      [
+          [x, y],
+          [x, y],
+          ...........
+      ],
+      //polyline
+      [
+          [x, y],
+          [x, y],
+          ...........
+      ],
+  ];
 
   const result = extrudePolygons(polygons, {
       depth: 2
@@ -82,89 +107,20 @@ pnpm i poly-extrude
       indices
   } = result;
   //do something
+```
 
-  const polylines = [
-      // polyline
-      [
-          [x, y],
-          [x, y], ...........
-      ],
-      //polyline
-      [
-          [x, y],
-          [x, y], ...........
-      ],
-  ];
+## API
 
-  const result = extrudePolylines(polylines, {
-      depth: 2,
-      lineWidth: 2
-  });
-  const {
-      positon,
-      normal,
-      uv,
-      indices
-  } = result;
-  //do something
+![](./img/extrudePolygons.png)
 
-  const center = [0, 0];
-  const result = cylinder(center, {
-      radius: 1,
-      height: 2,
-      radialSegments: 6
-  });
-  const {
-      positon,
-      normal,
-      uv,
-      indices
-  } = result;
-  //do something
+### `extrudePolygons(polygons, options)`
 
-  const polylines = [
-      // polyline
-      [
-          [x, y],
-          [x, y], ...........
-      ],
-      //polyline
-      [
-          [x, y],
-          [x, y], ...........
-      ],
-  ];
+* `polygons`
+* `options.depth`
 
-  const result = expandPaths(polylines, {
-      cornerRadius: 0.5,
-      lineWidth: 2
-  });
-  const {
-      positon,
-      normal,
-      uv,
-      indices
-  } = result;
-  //do something
-
-  const polylines = [
-      // polyline
-      [
-          [x, y],
-          [x, y], ...........
-      ],
-      //polyline
-      [
-          [x, y],
-          [x, y], ...........
-      ],
-  ];
-
-  const result = extrudeSlopes(polylines, {
-      depth: 1,
-      side: 'left',
-      sideDepth: 0,
-      lineWidth: 2
+```js
+  const result = extrudePolygons(polygons, {
+      depth: 2
   });
   const {
       positon,
@@ -175,132 +131,131 @@ pnpm i poly-extrude
   //do something
 ```
 
-### CDN
+![](./img/extrudePolylines.png)
+### `extrudePolylines(lines, options)`
 
-```html
-<script src="https://unpkg.com/poly-extrude/dist/poly-extrude.js"></script>
+* `lines`
+* `options.depth`
+* `options.lineWidth`
+* `options.bottomStickGround`  Is the bottom attached to the ground
 
-<script>
-    const polygons = [
-        //polygon
-        [
-            //outring
-            [
-                [x, y],
-                [x, y], ...........
-            ],
-            //holes
-            [
-                [x, y],
-                [x, y], ...........
-            ],
-            ........
+```js
+   const result = extrudePolylines(polylines, {
+       depth: 2,
+       lineWidth: 2
+   });
+   const {
+       positon,
+       normal,
+       uv,
+       indices
+   } = result;
+   //do something
+```
 
-        ],
-        //other polygons
-        ......
-    ]
+![](./img/cylinder.png)
+### `cylinder(center, options)`
 
-    const result = polyextrude.extrudePolygons(polygons, {
-        depth: 2
-    })
-    const {
-        positon,
-        normal,
-        uv,
-        indices
-    } = result;
-    //do something
+* `center`
+* `options.radius`
+* `options.height`
+* `options.radialSegments`
 
-    const polylines = [
-        // polyline
-        [
-            [x, y],
-            [x, y], ...........
-        ],
-        //polyline
-        [
-            [x, y],
-            [x, y], ...........
-        ],
-    ];
+```js
+const center = [0, 0];
+const result = cylinder(center, {
 
-    const result = polyextrude.extrudePolylines(polylines, {
-        depth: 2,
-        lineWidth: 2
-    });
-    const {
-        positon,
-        normal,
-        uv,
-        indices
-    } = result;
-    //do something
+    radius: 1,
+    height: 2,
+    radialSegments: 6
 
-    const center = [0, 0];
-    const result = polyextrude.cylinder(center, {
-        radius: 1,
-        height: 2,
-        radialSegments: 6
-    });
-    const {
-        positon,
-        normal,
-        uv,
-        indices
-    } = result;
-    //do something
+});
+const {
+    positon,
+    normal,
+    uv,
+    indices
 
-    const polylines = [
-        // polyline
-        [
-            [x, y],
-            [x, y], ...........
-        ],
-        //polyline
-        [
-            [x, y],
-            [x, y], ...........
-        ],
-    ];
+} = result;
+//do something
+```
 
-    const result = polyextrude.expandPaths(polylines, {
-        cornerRadius: 0.5,
-        lineWidth: 2
-    });
-    const {
-        positon,
-        normal,
-        uv,
-        indices
-    } = result;
-    //do something
+![](./img/expandPaths.png)
+### `expandPaths(lines, options)`
 
-     const polylines = [
-      // polyline
-      [
-          [x, y],
-          [x, y], ...........
-      ],
-      //polyline
-      [
-          [x, y],
-          [x, y], ...........
-      ],
-  ];
+* `lines`
+* `options.lineWidth`
 
-  const result = polyextrude.extrudeSlopes(polylines, {
-      depth: 1,
-      side: 'left',
-      sideDepth: 0,
-      lineWidth: 2
-  });
-  const {
-      positon,
-      normal,
-      uv,
-      indices
-  } = result;
-  //do something
-</script>
+```js
+const result = expandPaths(polylines, {
+
+    cornerRadius: 0.5,
+    lineWidth: 2
+
+});
+const {
+
+    positon,
+    normal,
+    uv,
+    indices
+
+} = result;
+//do something
+```
+
+![](./img/extrudeSlopes.png)
+
+### `extrudeSlopes(lines, options)`
+
+* `lines`
+* `options.depth`
+* `options.lineWidth`
+* `options.side` Which side serves as the slope, 'left' or 'right'
+* `options.sideDepth` slope depth 
+* `options.bottomStickGround` Is the bottom attached to the ground
+
+```js
+const result = extrudeSlopes(polylines, {
+
+    depth: 1,
+    side: 'left',
+    sideDepth: 0,
+    lineWidth: 2
+
+});
+const {
+
+    positon,
+    normal,
+    uv,
+    indices
+
+} = result;
+//do something
+```
+
+![](./img/expandTubes.png)
+### `expandTubes(lines, options)`
+
+* `lines`
+* `options.radius`
+* `options.radialSegments`
+
+```js
+const result = expandTubes(polylines, {
+
+    radius: 1,
+    radialSegments: 8
+
+});
+const {
+
+    positon,
+    normal,
+    uv,
+    indices
+
+} = result;
+//do something
 ```
