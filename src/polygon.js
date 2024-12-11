@@ -57,7 +57,9 @@ function generateTopAndBottom(result, triangles) {
 
 function generateSides(result, options) {
     const { points, index, polygon, uvs } = result;
-    const z = options.depth;
+    const depth = options.depth;
+    let pIndex = points.length - 1;
+    let iIndex = index.length - 1;
     for (let i = 0, len = polygon.length; i < len; i++) {
         const ring = polygon[i];
         let j = 0;
@@ -69,11 +71,29 @@ function generateSides(result, options) {
                 v2 = ring[0];
             }
             const idx = points.length / 3;
-            const x1 = v1[0], y1 = v1[1], x2 = v2[0], y2 = v2[1];
-            points.push(x1, y1, z, x2, y2, z, x1, y1, 0, x2, y2, 0);
+            const x1 = v1[0], y1 = v1[1], z1 = v1[2] || 0, x2 = v2[0], y2 = v2[1], z2 = v2[2] || 0;
+            points[++pIndex] = x1;
+            points[++pIndex] = y1;
+            points[++pIndex] = z1 + depth;
+            points[++pIndex] = x2;
+            points[++pIndex] = y2;
+            points[++pIndex] = z2 + depth;
+            points[++pIndex] = x1;
+            points[++pIndex] = y1;
+            points[++pIndex] = z1;
+            points[++pIndex] = x2;
+            points[++pIndex] = y2;
+            points[++pIndex] = z2;
+            // points.push(x1, y1, z, x2, y2, z, x1, y1, 0, x2, y2, 0);
             const a = idx + 2, b = idx + 3, c = idx, d = idx + 1;
             // points.push(p3, p4, p1, p2);
-            index.push(a, c, b, c, d, b);
+            // index.push(a, c, b, c, d, b);
+            index[++iIndex] = a;
+            index[++iIndex] = c;
+            index[++iIndex] = b;
+            index[++iIndex] = c;
+            index[++iIndex] = d;
+            index[++iIndex] = b;
             // index.push(c, d, b);
 
             generateSideWallUV(uvs, points, a, b, c, d);
@@ -98,7 +118,7 @@ function flatVertices(polygon, options) {
     const len = polygon.length;
     const holes = [], flatVertices = new Float32Array(count * 2), points = [], uvs = [];
     const pOffset = count * 3, uOffset = count * 2;
-    const z = options.depth;
+    const depth = options.depth;
 
     let idx0 = 0, idx1 = 0, idx2 = 0;
     for (let i = 0; i < len; i++) {
@@ -110,7 +130,7 @@ function flatVertices(polygon, options) {
         const len1 = ring.length;
         while (j < len1) {
             const c = ring[j];
-            const x = c[0], y = c[1];
+            const x = c[0], y = c[1], z = c[2] || 0;
 
             flatVertices[idx0++] = x;
             flatVertices[idx0++] = y;
@@ -118,12 +138,12 @@ function flatVertices(polygon, options) {
             // top vertices
             points[idx1] = x;
             points[idx1 + 1] = y;
-            points[idx1 + 2] = z;
+            points[idx1 + 2] = depth + z;
 
             // bottom vertices
             points[pOffset + idx1] = x;
             points[pOffset + idx1 + 1] = y;
-            points[pOffset + idx1 + 2] = 0;
+            points[pOffset + idx1 + 2] = z;
 
             uvs[idx2] = x;
             uvs[idx2 + 1] = y;
