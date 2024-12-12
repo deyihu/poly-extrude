@@ -15,9 +15,9 @@ export function expandPaths(lines, options) {
         pathPointList.set(points, options.cornerRadius, options.cornerSplit, UP);
         const result = generatePathVertexData(pathPointList, options);
         result.line = line;
-        result.position = new Float32Array(result.points);
-        result.indices = new Uint32Array(result.index);
-        result.uv = new Float32Array(result.uvs);
+        result.position = new Float32Array(result.position);
+        result.indices = new Uint32Array(result.indices);
+        result.uv = new Float32Array(result.uv);
         result.normal = new Float32Array(result.normal);
         return result;
     });
@@ -62,6 +62,10 @@ function generatePathVertexData(pathPointList, options) {
     const tempPoint1 = new Vector3();
     const tempPoint2 = new Vector3();
 
+    let pIndex = position.length - 1;
+    let nIndex = normal.length - 1;
+    let uIndex = uv.length - 1;
+    let iIndex = indices.length - 1;
     function addVertices(pathPoint) {
         const first = position.length === 0;
         const sharpCorner = pathPoint.sharp && !first;
@@ -118,66 +122,144 @@ function generatePathVertexData(pathPointList, options) {
             tempPoint2.copy(dir).setLength(_dist).add(tempPoint1);
 
             if (sideOffset > 0) {
-                position.push(
-                    tempPoint1.x, tempPoint1.y, tempPoint1.z, // 6
-                    right.x, right.y, right.z, // 5
-                    left.x, left.y, left.z, // 4
-                    right.x, right.y, right.z, // 3
-                    tempPoint2.x, tempPoint2.y, tempPoint2.z, // 2
-                    right.x, right.y, right.z // 1
-                );
+                position[++pIndex] = tempPoint1.x;
+                position[++pIndex] = tempPoint1.y;
+                position[++pIndex] = tempPoint1.z;
+                position[++pIndex] = right.x;
+                position[++pIndex] = right.y;
+                position[++pIndex] = right.z;
+                position[++pIndex] = left.x;
+                position[++pIndex] = left.y;
+                position[++pIndex] = left.z;
+                position[++pIndex] = right.x;
+                position[++pIndex] = right.y;
+                position[++pIndex] = right.z;
+                position[++pIndex] = tempPoint2.x;
+                position[++pIndex] = tempPoint2.y;
+                position[++pIndex] = tempPoint2.z;
+                position[++pIndex] = right.x;
+                position[++pIndex] = right.y;
+                position[++pIndex] = right.z;
+                // position.push(
+                //     tempPoint1.x, tempPoint1.y, tempPoint1.z, // 6
+                //     right.x, right.y, right.z, // 5
+                //     left.x, left.y, left.z, // 4
+                //     right.x, right.y, right.z, // 3
+                //     tempPoint2.x, tempPoint2.y, tempPoint2.z, // 2
+                //     right.x, right.y, right.z // 1
+                // );
 
                 verticesCount += 6;
 
-                indices.push(
-                    verticesCount - 6, verticesCount - 8, verticesCount - 7,
-                    verticesCount - 6, verticesCount - 7, verticesCount - 5,
+                indices[++iIndex] = verticesCount - 6;
+                indices[++iIndex] = verticesCount - 8;
+                indices[++iIndex] = verticesCount - 7;
+                indices[++iIndex] = verticesCount - 6;
+                indices[++iIndex] = verticesCount - 7;
+                indices[++iIndex] = verticesCount - 5;
+                indices[++iIndex] = verticesCount - 4;
+                indices[++iIndex] = verticesCount - 6;
+                indices[++iIndex] = verticesCount - 5;
+                indices[++iIndex] = verticesCount - 2;
+                indices[++iIndex] = verticesCount - 4;
+                indices[++iIndex] = verticesCount - 1;
 
-                    verticesCount - 4, verticesCount - 6, verticesCount - 5,
-                    verticesCount - 2, verticesCount - 4, verticesCount - 1
-                );
+                // indices.push(
+                //     verticesCount - 6, verticesCount - 8, verticesCount - 7,
+                //     verticesCount - 6, verticesCount - 7, verticesCount - 5,
+
+                //     verticesCount - 4, verticesCount - 6, verticesCount - 5,
+                //     verticesCount - 2, verticesCount - 4, verticesCount - 1
+                // );
 
                 count += 12;
             } else {
-                position.push(
-                    left.x, left.y, left.z, // 6
-                    tempPoint1.x, tempPoint1.y, tempPoint1.z, // 5
-                    left.x, left.y, left.z, // 4
-                    right.x, right.y, right.z, // 3
-                    left.x, left.y, left.z, // 2
-                    tempPoint2.x, tempPoint2.y, tempPoint2.z // 1
-                );
+                position[++pIndex] = left.x;
+                position[++pIndex] = left.y;
+                position[++pIndex] = left.z;
+                position[++pIndex] = tempPoint1.x;
+                position[++pIndex] = tempPoint1.y;
+                position[++pIndex] = tempPoint1.z;
+                position[++pIndex] = left.x;
+                position[++pIndex] = left.y;
+                position[++pIndex] = left.z;
+                position[++pIndex] = right.x;
+                position[++pIndex] = right.y;
+                position[++pIndex] = right.z;
+                position[++pIndex] = left.x;
+                position[++pIndex] = left.y;
+                position[++pIndex] = left.z;
+                position[++pIndex] = tempPoint2.x;
+                position[++pIndex] = tempPoint2.y;
+                position[++pIndex] = tempPoint2.z;
+                // position.push(
+                //     left.x, left.y, left.z, // 6
+                //     tempPoint1.x, tempPoint1.y, tempPoint1.z, // 5
+                //     left.x, left.y, left.z, // 4
+                //     right.x, right.y, right.z, // 3
+                //     left.x, left.y, left.z, // 2
+                //     tempPoint2.x, tempPoint2.y, tempPoint2.z // 1
+                // );
 
                 verticesCount += 6;
+                indices[++iIndex] = verticesCount - 6;
+                indices[++iIndex] = verticesCount - 8;
+                indices[++iIndex] = verticesCount - 7;
+                indices[++iIndex] = verticesCount - 6;
+                indices[++iIndex] = verticesCount - 7;
+                indices[++iIndex] = verticesCount - 5;
+                indices[++iIndex] = verticesCount - 6;
+                indices[++iIndex] = verticesCount - 5;
+                indices[++iIndex] = verticesCount - 3;
+                indices[++iIndex] = verticesCount - 2;
+                indices[++iIndex] = verticesCount - 3;
+                indices[++iIndex] = verticesCount - 1;
 
-                indices.push(
-                    verticesCount - 6, verticesCount - 8, verticesCount - 7,
-                    verticesCount - 6, verticesCount - 7, verticesCount - 5,
+                // indices.push(
+                //     verticesCount - 6, verticesCount - 8, verticesCount - 7,
+                //     verticesCount - 6, verticesCount - 7, verticesCount - 5,
 
-                    verticesCount - 6, verticesCount - 5, verticesCount - 3,
-                    verticesCount - 2, verticesCount - 3, verticesCount - 1
-                );
+                //     verticesCount - 6, verticesCount - 5, verticesCount - 3,
+                //     verticesCount - 2, verticesCount - 3, verticesCount - 1
+                // );
 
                 count += 12;
             }
+            for (let i = 0; i < 6; i++) {
+                normal[++nIndex] = up.x;
+                normal[++nIndex] = up.y;
+                normal[++nIndex] = up.z;
+            }
 
-            normal.push(
-                up.x, up.y, up.z,
-                up.x, up.y, up.z,
-                up.x, up.y, up.z,
-                up.x, up.y, up.z,
-                up.x, up.y, up.z,
-                up.x, up.y, up.z
-            );
+            // normal.push(
+            //     up.x, up.y, up.z,
+            //     up.x, up.y, up.z,
+            //     up.x, up.y, up.z,
+            //     up.x, up.y, up.z,
+            //     up.x, up.y, up.z,
+            //     up.x, up.y, up.z
+            // );
 
-            uv.push(
-                uvDist - sharpUvOffset, 0,
-                uvDist - sharpUvOffset, 1,
-                uvDist, 0,
-                uvDist, 1,
-                uvDist + sharpUvOffset, 0,
-                uvDist + sharpUvOffset, 1
-            );
+            uv[++uIndex] = uvDist - sharpUvOffset;
+            uv[++uIndex] = 0;
+            uv[++uIndex] = uvDist - sharpUvOffset;
+            uv[++uIndex] = 1;
+            uv[++uIndex] = uvDist;
+            uv[++uIndex] = 0;
+            uv[++uIndex] = uvDist;
+            uv[++uIndex] = 1;
+            uv[++uIndex] = uvDist + sharpUvOffset;
+            uv[++uIndex] = 0;
+            uv[++uIndex] = uvDist + sharpUvOffset;
+            uv[++uIndex] = 1;
+            // uv.push(
+            //     uvDist - sharpUvOffset, 0,
+            //     uvDist - sharpUvOffset, 1,
+            //     uvDist, 0,
+            //     uvDist, 1,
+            //     uvDist + sharpUvOffset, 0,
+            //     uvDist + sharpUvOffset, 1
+            // );
 
             // if (generateUv2) {
             //     uv2.push(
@@ -190,20 +272,36 @@ function generatePathVertexData(pathPointList, options) {
             //     );
             // }
         } else {
-            position.push(
-                left.x, left.y, left.z,
-                right.x, right.y, right.z
-            );
+            position[++pIndex] = left.x;
+            position[++pIndex] = left.y;
+            position[++pIndex] = left.z;
+            position[++pIndex] = right.x;
+            position[++pIndex] = right.y;
+            position[++pIndex] = right.z;
+            // position.push(
+            //     left.x, left.y, left.z,
+            //     right.x, right.y, right.z
+            // );
 
-            normal.push(
-                up.x, up.y, up.z,
-                up.x, up.y, up.z
-            );
+            normal[++nIndex] = up.x;
+            normal[++nIndex] = up.y;
+            normal[++nIndex] = up.z;
+            normal[++nIndex] = up.x;
+            normal[++nIndex] = up.y;
+            normal[++nIndex] = up.z;
+            // normal.push(
+            //     up.x, up.y, up.z,
+            //     up.x, up.y, up.z
+            // );
 
-            uv.push(
-                uvDist, 0,
-                uvDist, 1
-            );
+            uv[++uIndex] = uvDist;
+            uv[++uIndex] = 0;
+            uv[++uIndex] = uvDist;
+            uv[++uIndex] = 1;
+            // uv.push(
+            //     uvDist, 0,
+            //     uvDist, 1
+            // );
 
             // if (generateUv2) {
             //     uv2.push(
@@ -215,10 +313,16 @@ function generatePathVertexData(pathPointList, options) {
             verticesCount += 2;
 
             if (!first) {
-                indices.push(
-                    verticesCount - 2, verticesCount - 4, verticesCount - 3,
-                    verticesCount - 2, verticesCount - 3, verticesCount - 1
-                );
+                indices[++iIndex] = verticesCount - 2;
+                indices[++iIndex] = verticesCount - 4;
+                indices[++iIndex] = verticesCount - 3;
+                indices[++iIndex] = verticesCount - 2;
+                indices[++iIndex] = verticesCount - 3;
+                indices[++iIndex] = verticesCount - 1;
+                // indices.push(
+                //     verticesCount - 2, verticesCount - 4, verticesCount - 3,
+                //     verticesCount - 2, verticesCount - 3, verticesCount - 1
+                // );
 
                 count += 6;
             }
@@ -250,10 +354,10 @@ function generatePathVertexData(pathPointList, options) {
     }
 
     return {
-        points: position,
+        position: position,
         normal,
-        uvs: uv,
-        index: indices,
+        uv: uv,
+        indices: indices,
         count
     };
 }

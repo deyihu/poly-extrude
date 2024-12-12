@@ -25,8 +25,8 @@ export function extrudePolygons(polygons, options) {
         generateTopAndBottom(result, triangles);
         generateSides(result, options);
         result.position = new Float32Array(result.points);
-        result.indices = new Uint32Array(result.index);
-        result.uv = new Float32Array(result.uvs);
+        result.indices = new Uint32Array(result.indices);
+        result.uv = new Float32Array(result.uv);
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
@@ -37,29 +37,29 @@ export function extrudePolygons(polygons, options) {
 }
 
 function generateTopAndBottom(result, triangles) {
-    const index = [];
+    const indices = [];
     const { count } = result;
     for (let i = 0, len = triangles.length; i < len; i += 3) {
         // top
         const a = triangles[i], b = triangles[i + 1], c = triangles[i + 2];
-        index[i] = a;
-        index[i + 1] = b;
-        index[i + 2] = c;
+        indices[i] = a;
+        indices[i + 1] = b;
+        indices[i + 2] = c;
         // bottom
         const idx = len + i;
         const a1 = count + a, b1 = count + b, c1 = count + c;
-        index[idx] = a1;
-        index[idx + 1] = b1;
-        index[idx + 2] = c1;
+        indices[idx] = a1;
+        indices[idx + 1] = b1;
+        indices[idx + 2] = c1;
     }
-    result.index = index;
+    result.indices = indices;
 }
 
 function generateSides(result, options) {
-    const { points, index, polygon, uvs } = result;
+    const { points, indices, polygon, uv } = result;
     const depth = options.depth;
     let pIndex = points.length - 1;
-    let iIndex = index.length - 1;
+    let iIndex = indices.length - 1;
     for (let i = 0, len = polygon.length; i < len; i++) {
         const ring = polygon[i];
         let j = 0;
@@ -88,15 +88,15 @@ function generateSides(result, options) {
             const a = idx + 2, b = idx + 3, c = idx, d = idx + 1;
             // points.push(p3, p4, p1, p2);
             // index.push(a, c, b, c, d, b);
-            index[++iIndex] = a;
-            index[++iIndex] = c;
-            index[++iIndex] = b;
-            index[++iIndex] = c;
-            index[++iIndex] = d;
-            index[++iIndex] = b;
+            indices[++iIndex] = a;
+            indices[++iIndex] = c;
+            indices[++iIndex] = b;
+            indices[++iIndex] = c;
+            indices[++iIndex] = d;
+            indices[++iIndex] = b;
             // index.push(c, d, b);
 
-            generateSideWallUV(uvs, points, a, b, c, d);
+            generateSideWallUV(uv, points, a, b, c, d);
             j++;
         }
     }
@@ -116,7 +116,7 @@ function calPolygonPointsCount(polygon) {
 function flatVertices(polygon, options) {
     const count = calPolygonPointsCount(polygon);
     const len = polygon.length;
-    const holes = [], flatVertices = new Float32Array(count * 2), points = [], uvs = [];
+    const holes = [], flatVertices = new Float32Array(count * 2), points = [], uv = [];
     const pOffset = count * 3, uOffset = count * 2;
     const depth = options.depth;
 
@@ -145,11 +145,11 @@ function flatVertices(polygon, options) {
             points[pOffset + idx1 + 1] = y;
             points[pOffset + idx1 + 2] = z;
 
-            uvs[idx2] = x;
-            uvs[idx2 + 1] = y;
+            uv[idx2] = x;
+            uv[idx2 + 1] = y;
 
-            uvs[uOffset + idx2] = x;
-            uvs[uOffset + idx2 + 1] = y;
+            uv[uOffset + idx2] = x;
+            uv[uOffset + idx2 + 1] = y;
 
             idx1 += 3;
             idx2 += 2;
@@ -161,7 +161,7 @@ function flatVertices(polygon, options) {
         holes,
         points,
         count,
-        uvs
+        uv
     };
 
 }

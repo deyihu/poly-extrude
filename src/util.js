@@ -176,17 +176,35 @@ export function generateSideWallUV(uvs, vertices, indexA, indexB, indexC, indexD
     const d_y = vertices[idx4 + 1];
     const d_z = vertices[idx4 + 2];
 
+    let uIndex = uvs.length - 1;
     if (Math.abs(a_y - b_y) < Math.abs(a_x - b_x)) {
+        uvs[++uIndex] = a_x;
+        uvs[++uIndex] = 1 - a_z;
+        uvs[++uIndex] = b_x;
+        uvs[++uIndex] = 1 - b_z;
+        uvs[++uIndex] = c_x;
+        uvs[++uIndex] = 1 - c_z;
+        uvs[++uIndex] = d_x;
+        uvs[++uIndex] = 1 - d_z;
 
-        uvs.push(a_x, 1 - a_z);
-        uvs.push(b_x, 1 - b_z);
-        uvs.push(c_x, 1 - c_z);
-        uvs.push(d_x, 1 - d_z);
+        // uvs.push(a_x, 1 - a_z);
+        // uvs.push(b_x, 1 - b_z);
+        // uvs.push(c_x, 1 - c_z);
+        // uvs.push(d_x, 1 - d_z);
     } else {
-        uvs.push(a_y, 1 - a_z);
-        uvs.push(b_y, 1 - b_z);
-        uvs.push(c_y, 1 - c_z);
-        uvs.push(d_y, 1 - d_z);
+        uvs[++uIndex] = a_y;
+        uvs[++uIndex] = 1 - a_z;
+        uvs[++uIndex] = b_y;
+        uvs[++uIndex] = 1 - b_z;
+        uvs[++uIndex] = c_y;
+        uvs[++uIndex] = 1 - c_z;
+        uvs[++uIndex] = d_y;
+        uvs[++uIndex] = 1 - d_z;
+
+        // uvs.push(a_y, 1 - a_z);
+        // uvs.push(b_y, 1 - b_z);
+        // uvs.push(c_y, 1 - c_z);
+        // uvs.push(d_y, 1 - d_z);
     }
 
 }

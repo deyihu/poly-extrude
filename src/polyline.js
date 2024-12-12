@@ -15,8 +15,8 @@ export function extrudePolylines(lines, options) {
         generateTopAndBottom(result, options);
         generateSides(result, options);
         result.position = new Float32Array(result.points);
-        result.indices = new Uint32Array(result.index);
-        result.uv = new Float32Array(result.uvs);
+        result.indices = new Uint32Array(result.indices);
+        result.uv = new Float32Array(result.uv);
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
@@ -51,8 +51,8 @@ export function extrudeSlopes(lines, options) {
         generateTopAndBottom(result, options);
         generateSides(result, options);
         result.position = new Float32Array(result.points);
-        result.indices = new Uint32Array(result.index);
-        result.uv = new Float32Array(result.uvs);
+        result.indices = new Uint32Array(result.indices);
+        result.uv = new Float32Array(result.uv);
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
@@ -70,7 +70,7 @@ function generateTopAndBottom(result, options) {
         lz = depths[0];
         rz = depths[1];
     }
-    const points = [], index = [], uvs = [];
+    const points = [], indices = [], uv = [];
     const { leftPoints, rightPoints } = result;
     let i = 0, len = leftPoints.length;
     while (i < len) {
@@ -110,31 +110,47 @@ function generateTopAndBottom(result, options) {
     }
     i = 0;
     len = points.length;
+    let uIndex = uv.length - 1;
     while (i < len) {
         const x = points[i], y = points[i + 1];
-        uvs.push(x, y);
+        uv[++uIndex] = x;
+        uv[++uIndex] = y;
+        // uvs.push(x, y);
         i += 3;
     }
     i = 0;
     len = leftPoints.length;
+    let iIndex = indices.length - 1;
     while (i < len - 1) {
         // top
         // left1 left2 right1,right2
         const a1 = i, b1 = i + 1, c1 = a1 + len, d1 = b1 + len;
-        index.push(a1, c1, b1);
-        index.push(c1, d1, b1);
+        indices[++iIndex] = a1;
+        indices[++iIndex] = c1;
+        indices[++iIndex] = b1;
+        indices[++iIndex] = c1;
+        indices[++iIndex] = d1;
+        indices[++iIndex] = b1;
+        // index.push(a1, c1, b1);
+        // index.push(c1, d1, b1);
 
         // bottom
         // left1 left2 right1,right2
         const len2 = len * 2;
         const a2 = i + len2, b2 = a2 + 1, c2 = a2 + len, d2 = b2 + len;
-        index.push(a2, c2, b2);
-        index.push(c2, d2, b2);
+        indices[++iIndex] = a2;
+        indices[++iIndex] = c2;
+        indices[++iIndex] = b2;
+        indices[++iIndex] = c2;
+        indices[++iIndex] = d2;
+        indices[++iIndex] = b2;
+        // index.push(a2, c2, b2);
+        // index.push(c2, d2, b2);
         i++;
     }
-    result.index = index;
+    result.indices = indices;
     result.points = points;
-    result.uvs = uvs;
+    result.uv = uv;
     if (depths) {
         len = leftPoints.length;
         i = 0;
@@ -147,15 +163,17 @@ function generateTopAndBottom(result, options) {
 }
 
 function generateSides(result, options) {
-    const { points, index, leftPoints, rightPoints, uvs } = result;
+    const { points, indices, leftPoints, rightPoints, uv } = result;
     const z = options.depth;
     const bottomStickGround = options.bottomStickGround;
     const rings = [leftPoints, rightPoints];
     const depthsEnable = result.depths;
 
+    let pIndex = points.length - 1;
+    let iIndex = indices.length - 1;
     function addOneSideIndex(v1, v2) {
         const idx = points.length / 3;
-        let pIndex = points.length - 1;
+        // let pIndex = points.length - 1;
 
         // top
         points[++pIndex] = v1[0];
@@ -181,8 +199,14 @@ function generateSides(result, options) {
         // points.push(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
 
         const a = idx + 2, b = idx + 3, c = idx, d = idx + 1;
-        index.push(a, c, b, c, d, b);
-        generateSideWallUV(uvs, points, a, b, c, d);
+        indices[++iIndex] = a;
+        indices[++iIndex] = c;
+        indices[++iIndex] = b;
+        indices[++iIndex] = c;
+        indices[++iIndex] = d;
+        indices[++iIndex] = b;
+        // index.push(a, c, b, c, d, b);
+        generateSideWallUV(uv, points, a, b, c, d);
     }
 
     for (let i = 0, len = rings.length; i < len; i++) {

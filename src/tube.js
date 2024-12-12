@@ -16,8 +16,8 @@ export function expandTubes(lines, options) {
         const result = generateTubeVertexData(pathPointList, options);
         result.line = line;
         result.position = new Float32Array(result.points);
-        result.indices = new Uint32Array(result.index);
-        result.uv = new Float32Array(result.uvs);
+        result.indices = new Uint32Array(result.indices);
+        result.uv = new Float32Array(result.uv);
         result.normal = new Float32Array(result.normal);
         return result;
     });
@@ -46,9 +46,9 @@ function generateTubeVertexData(pathPointList, options) {
     // modify data
     const points = [];
     const normal = [];
-    const uvs = [];
+    const uv = [];
     // const uv2 = [];
-    const index = [];
+    const indices = [];
     let verticesCount = 0;
 
     const normalDir = new Vector3();
@@ -78,8 +78,8 @@ function generateTubeVertexData(pathPointList, options) {
             normal[++nIndex] = normalDir.y;
             normal[++nIndex] = normalDir.z;
 
-            uvs[++uIndex] = uvDist;
-            uvs[++uIndex] = i / radialSegments;
+            uv[++uIndex] = uvDist;
+            uv[++uIndex] = i / radialSegments;
 
             // uvs.push(uvDist, r / radialSegments);
 
@@ -95,12 +95,12 @@ function generateTubeVertexData(pathPointList, options) {
             const begin2 = verticesCount - (radialSegments + 1);
 
             for (let i = 0; i < radialSegments; i++) {
-                index[++iIndex] = begin2 + i;
-                index[++iIndex] = begin1 + i;
-                index[++iIndex] = begin1 + i + 1;
-                index[++iIndex] = begin2 + i;
-                index[++iIndex] = begin1 + i + 1;
-                index[++iIndex] = begin2 + i + 1;
+                indices[++iIndex] = begin2 + i;
+                indices[++iIndex] = begin1 + i;
+                indices[++iIndex] = begin1 + i + 1;
+                indices[++iIndex] = begin2 + i;
+                indices[++iIndex] = begin1 + i + 1;
+                indices[++iIndex] = begin2 + i + 1;
                 // index.push(
                 //     begin2 + i,
                 //     begin1 + i,
@@ -138,9 +138,9 @@ function generateTubeVertexData(pathPointList, options) {
     return {
         points,
         normal,
-        uvs,
+        uv,
         // uv2,
-        index,
+        indices,
         count
     };
 }
