@@ -672,7 +672,7 @@ class Quaternion {
 
     }
 
-    // _onChangeCallback() { }
+    _onChangeCallback() { }
 
     // * [Symbol.iterator]() {
 
