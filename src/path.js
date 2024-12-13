@@ -1,16 +1,22 @@
 import { Vector3 } from './math/Vector3';
 import { PathPoint } from './path/PathPoint';
 import { PathPointList } from './path/PathPointList';
-import { merge } from './util';
+import { line2Vectors, merge } from './util';
 const UP = new Vector3(0, 0, 1);
+
+const right = new Vector3();
+const left = new Vector3();
+
+// for sharp corners
+const leftOffset = new Vector3();
+const rightOffset = new Vector3();
+const tempPoint1 = new Vector3();
+const tempPoint2 = new Vector3();
 
 export function expandPaths(lines, options) {
     options = Object.assign({}, { lineWidth: 1, cornerRadius: 0, cornerSplit: 10 }, options);
     const results = lines.map(line => {
-        const points = line.map(p => {
-            const [x, y, z] = p;
-            return new Vector3(x, y, z || 0);
-        });
+        const points = line2Vectors(line);
         const pathPointList = new PathPointList();
         pathPointList.set(points, options.cornerRadius, options.cornerSplit, UP);
         const result = generatePathVertexData(pathPointList, options);
@@ -52,15 +58,6 @@ function generatePathVertexData(pathPointList, options) {
     const uv = [];
     const indices = [];
     let verticesCount = 0;
-
-    const right = new Vector3();
-    const left = new Vector3();
-
-    // for sharp corners
-    const leftOffset = new Vector3();
-    const rightOffset = new Vector3();
-    const tempPoint1 = new Vector3();
-    const tempPoint2 = new Vector3();
 
     let pIndex = position.length - 1;
     let nIndex = normal.length - 1;

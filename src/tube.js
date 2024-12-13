@@ -1,16 +1,14 @@
 import { Vector3 } from './math/Vector3';
 import { PathPoint } from './path/PathPoint';
 import { PathPointList } from './path/PathPointList';
-import { merge } from './util';
+import { line2Vectors, merge } from './util';
 const UP = new Vector3(0, 0, 1);
+const normalDir = new Vector3();
 
 export function expandTubes(lines, options) {
     options = Object.assign({}, { radius: 1, cornerSplit: 0, radialSegments: 8, startRad: -Math.PI / 4 }, options);
     const results = lines.map(line => {
-        const points = line.map(p => {
-            const [x, y, z] = p;
-            return new Vector3(x, y, z || 0);
-        });
+        const points = line2Vectors(line);
         const pathPointList = new PathPointList();
         pathPointList.set(points, options.cornerRadius, options.cornerSplit, UP);
         const result = generateTubeVertexData(pathPointList, options);
@@ -50,8 +48,6 @@ function generateTubeVertexData(pathPointList, options) {
     // const uv2 = [];
     const indices = [];
     let verticesCount = 0;
-
-    const normalDir = new Vector3();
 
     let pIndex = -1;
     let nIndex = -1;

@@ -672,16 +672,16 @@ class Quaternion {
 
     }
 
-    _onChangeCallback() { }
+    // _onChangeCallback() { }
 
-    * [Symbol.iterator]() {
+    // * [Symbol.iterator]() {
 
-        yield this._x;
-        yield this._y;
-        yield this._z;
-        yield this._w;
+    //     yield this._x;
+    //     yield this._y;
+    //     yield this._z;
+    //     yield this._w;
 
-    }
+    // }
 
 }
 

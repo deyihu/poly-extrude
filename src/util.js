@@ -1,3 +1,5 @@
+import { Vector3 } from './math/Vector3';
+
 /**
  * https://github.com/Turfjs/turf/blob/master/packages/turf-boolean-clockwise/index.ts
  * @param {*} ring
@@ -207,4 +209,15 @@ export function generateSideWallUV(uvs, vertices, indexA, indexB, indexC, indexD
         // uvs.push(d_y, 1 - d_z);
     }
 
+}
+
+export function line2Vectors(line) {
+    const points = [];
+    for (let i = 0, len = line.length; i < len; i++) {
+        const p = line[i];
+        const [x, y, z] = p;
+        const v = new Vector3(x, y, z || 0);
+        points[i] = v;
+    }
+    return points;
 }
