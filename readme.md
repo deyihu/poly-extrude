@@ -129,7 +129,8 @@ npm i poly-extrude
 * `lines`
 * `options.depth`
 * `options.lineWidth`
-* `options.bottomStickGround`  Is the bottom attached to the ground
+* `options.bottomStickGround`  Is the bottom attached to the ground 
+* `options.pathuV`  generate Path UV
 
 ```js
    const result = extrudePolylines(polylines, {
@@ -206,6 +207,7 @@ const {
 * `options.side` Which side serves as the slope, 'left' or 'right'
 * `options.sideDepth` slope depth 
 * `options.bottomStickGround` Is the bottom attached to the ground
+* `options.pathuV`  generate Path UV
 
 ```js
 const result = extrudeSlopes(polylines, {
