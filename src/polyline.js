@@ -1,4 +1,4 @@
-import { degToRad, generateNormal, generateSideWallUV, merge, radToDeg } from './util';
+import { calLineDistance, degToRad, generateNormal, generateSideWallUV, merge, radToDeg } from './util';
 
 function checkOptions(options) {
     options.lineWidth = Math.max(0, options.lineWidth);
@@ -7,7 +7,7 @@ function checkOptions(options) {
 }
 
 export function extrudePolylines(lines, options) {
-    options = Object.assign({}, { depth: 2, lineWidth: 1, bottomStickGround: false }, options);
+    options = Object.assign({}, { depth: 2, lineWidth: 1, bottomStickGround: false, pathUV: false }, options);
     checkOptions(options);
     const results = lines.map(line => {
         const result = expandLine(line, options);
@@ -26,7 +26,7 @@ export function extrudePolylines(lines, options) {
 }
 
 export function extrudeSlopes(lines, options) {
-    options = Object.assign({}, { depth: 2, lineWidth: 1, side: 'left', sideDepth: 0, bottomStickGround: false }, options);
+    options = Object.assign({}, { depth: 2, lineWidth: 1, side: 'left', sideDepth: 0, bottomStickGround: false, pathUV: false, isSlope: true }, options);
     checkOptions(options);
     const { depth, side, sideDepth } = options;
     const results = lines.map(line => {
@@ -70,9 +70,17 @@ function generateTopAndBottom(result, options) {
         lz = depths[0];
         rz = depths[1];
     }
-    const points = [], indices = [], uv = [];
     const { leftPoints, rightPoints } = result;
+    const line = result.line;
+    const pathUV = options.pathUV;
+    if (pathUV) {
+        calLineDistance(line);
+        for (let i = 0, len = line.length; i < len; i++) {
+            leftPoints[i].distance = rightPoints[i].distance = line[i].distance;
+        }
+    }
     let i = 0, len = leftPoints.length;
+    const points = [], indices = [], uv = [];
     while (i < len) {
         // top left
         const idx0 = i * 3;
@@ -106,18 +114,43 @@ function generateTopAndBottom(result, options) {
             points[idx3 + 2] = 0;
         }
 
+        // generate path uv
+        if (pathUV) {
+            const p = line[i];
+            const uvx = p.distance;
+
+            const uIndex0 = i * 2;
+            uv[uIndex0] = uvx;
+            uv[uIndex0 + 1] = 1;
+
+            const uIndex1 = len * 2 + uIndex0;
+            uv[uIndex1] = uvx;
+            uv[uIndex1 + 1] = 0;
+
+            const uIndex2 = (len * 2) * 2 + uIndex0;
+            uv[uIndex2] = uvx;
+            uv[uIndex2 + 1] = 1;
+
+            const uIndex3 = (len * 2) * 2 + len * 2 + uIndex0;
+            uv[uIndex3] = uvx;
+            uv[uIndex3 + 1] = 0;
+
+        }
         i++;
     }
-    i = 0;
-    len = points.length;
-    let uIndex = uv.length - 1;
-    while (i < len) {
-        const x = points[i], y = points[i + 1];
-        uv[++uIndex] = x;
-        uv[++uIndex] = y;
-        // uvs.push(x, y);
-        i += 3;
+    if (!pathUV) {
+        i = 0;
+        len = points.length;
+        let uIndex = uv.length - 1;
+        while (i < len) {
+            const x = points[i], y = points[i + 1];
+            uv[++uIndex] = x;
+            uv[++uIndex] = y;
+            // uvs.push(x, y);
+            i += 3;
+        }
     }
+
     i = 0;
     len = leftPoints.length;
     let iIndex = indices.length - 1;
@@ -168,21 +201,28 @@ function generateSides(result, options) {
     const bottomStickGround = options.bottomStickGround;
     const rings = [leftPoints, rightPoints];
     const depthsEnable = result.depths;
+    const pathUV = options.pathUV;
+    const lineWidth = options.lineWidth;
 
     let pIndex = points.length - 1;
     let iIndex = indices.length - 1;
+    let uIndex = uv.length - 1;
+
     function addOneSideIndex(v1, v2) {
         const idx = points.length / 3;
         // let pIndex = points.length - 1;
 
+        const v1Depth = (depthsEnable ? v1.depth : z);
+        const v2Depth = (depthsEnable ? v2.depth : z);
+
         // top
         points[++pIndex] = v1[0];
         points[++pIndex] = v1[1];
-        points[++pIndex] = (depthsEnable ? v1.depth : z) + v1[2];
+        points[++pIndex] = v1Depth + v1[2];
 
         points[++pIndex] = v2[0];
         points[++pIndex] = v2[1];
-        points[++pIndex] = (depthsEnable ? v2.depth : z) + v2[2];
+        points[++pIndex] = v2Depth + v2[2];
 
         // points.push(v1[0], v1[1], (depthsEnable ? v1.depth : z) + v1[2], v2[0], v2[1], (depthsEnable ? v2.depth : z) + v2[2]);
 
@@ -206,7 +246,21 @@ function generateSides(result, options) {
         indices[++iIndex] = d;
         indices[++iIndex] = b;
         // index.push(a, c, b, c, d, b);
-        generateSideWallUV(uv, points, a, b, c, d);
+        if (!pathUV) {
+            generateSideWallUV(uv, points, a, b, c, d);
+        } else {
+            uv[++uIndex] = v1.distance;
+            uv[++uIndex] = v1Depth / lineWidth;
+
+            uv[++uIndex] = v2.distance;
+            uv[++uIndex] = v2Depth / lineWidth;
+
+            uv[++uIndex] = v1.distance;
+            uv[++uIndex] = 0;
+
+            uv[++uIndex] = v2.distance;
+            uv[++uIndex] = 0;
+        }
     }
 
     for (let i = 0, len = rings.length; i < len; i++) {
@@ -238,7 +292,10 @@ const TEMPV1 = { x: 0, y: 0 }, TEMPV2 = { x: 0, y: 0 };
 
 export function expandLine(line, options) {
     // let preAngle = 0;
-    const radius = options.lineWidth / 2;
+    let radius = options.lineWidth / 2;
+    if (options.isSlope) {
+        radius *= 2;
+    }
     const points = [], leftPoints = [], rightPoints = [];
     const len = line.length;
     let i = 0;
@@ -302,7 +359,7 @@ export function expandLine(line, options) {
         i++;
     }
 
-    return { offsetPoints: points, leftPoints, rightPoints };
+    return { offsetPoints: points, leftPoints, rightPoints, line };
 }
 
 // eslint-disable-next-line no-unused-vars

@@ -221,3 +221,22 @@ export function line2Vectors(line) {
     }
     return points;
 }
+
+export function calLineDistance(line) {
+    let distance = 0;
+    for (let i = 0, len = line.length; i < len; i++) {
+        const p1 = line[i], p2 = line[i + 1];
+        if (i === 0) {
+            p1.distance = 0;
+        }
+        if (p1 && p2) {
+            const [x1, y1, z1] = p1;
+            const [x2, y2, z2] = p2;
+            const dx = x1 - x2, dy = y1 - y2, dz = (z1 || 0) - (z2 || 0);
+            const dis = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            distance += dis;
+            p2.distance = distance;
+        }
+    }
+    return distance;
+}
