@@ -33,7 +33,7 @@
             texture.needsUpdate = true; //使用贴图时进行更新
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
             // texture.repeat.set(0.002, 0.002);
-            texture.repeat.set(2, 2);
+            texture.repeat.set(1, 8);
             return texture;
         }
 
@@ -44,29 +44,22 @@
             map: getTexture()
         })
 
-        function test() {
-            // const result = polyextrude.cylinder([0, 0], { radius: 4, radialSegments: 100, height: 40 });
-            // const geometry = createBufferGeometry(result);
-            // const mesh = new THREE.Mesh(geometry, material);
-            // scene.add(mesh);
-            // console.log(result);
 
-            const time = 'time';
-            console.time(time);
-            const results = [];
-            const size = 10;
-            for (let i = -size; i < size; i++) {
-                for (let j = -size; j < size; j++) {
-                    const result = polyextrude.cylinder([i * 2, j * 2], { radius: 1, radialSegments: 6, height: 6 + Math.random() * 6 });
-                    results.push(result);
-                }
-            }
-            console.timeEnd(time);
-            results.forEach(result => {
-                const geometry = createBufferGeometry(result);
-                const mesh = new THREE.Mesh(geometry, material);
-                scene.add(mesh);
-            });
+        function test() {
+            getGeoJSON('./data/slope.geojson').then(geojson => {
+                flatCoordinates(geojson);
+                geojson.features.forEach(feature => {
+                    const { type, coordinates } = feature.geometry;
+                    const time = 'time';
+                    console.time(time);
+                    const result = polyextrude.extrudeSlopes(type === 'LineString' ? [coordinates] : coordinates, { depth: 8, lineWidth: 8, sideDepth: 1, side: 'left', pathUV: true });
+                    console.timeEnd(time);
+                    console.log(result);
+                    const geometry = createBufferGeometry(result);
+                    const mesh = new THREE.Mesh(geometry, material);
+                    scene.add(mesh);
+                });
+            })
         }
         test();
 

@@ -52,7 +52,7 @@
                     const { type, coordinates } = feature.geometry;
                     const time = 'time';
                     console.time(time);
-                    const result = polyextrude.extrudeSlopes(type === 'LineString' ? [coordinates] : coordinates, { depth: 8, lineWidth: 22, sideDepth: 1, side: 'left' });
+                    const result = polyextrude.extrudeSlopes(type === 'LineString' ? [coordinates] : coordinates, { depth: 8, lineWidth: 8, sideDepth: 1, side: 'left' });
                     console.timeEnd(time);
                     console.log(result);
                     const geometry = createBufferGeometry(result);
