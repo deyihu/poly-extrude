@@ -42,7 +42,7 @@ const globals = {
 
 };
 const name = 'polyextrude';
-export default [
+const bundleList = [
     {
         input: path.join(__dirname, './index.js'),
         plugins: plugins,
@@ -95,3 +95,6 @@ export default [
         }
     }
 ];
+
+const filterBundleList = !product ? bundleList.slice(0, 1) : bundleList;
+export default filterBundleList;
