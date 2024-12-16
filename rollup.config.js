@@ -44,7 +44,7 @@ const globals = {
 const name = 'polyextrude';
 const bundleList = [
     {
-        input: path.join(__dirname, './index.js'),
+        input: path.join(__dirname, './src/index.js'),
         plugins: plugins,
         // sourceMap: true,
         external,
@@ -61,7 +61,7 @@ const bundleList = [
         }
     },
     {
-        input: path.join(__dirname, './index.js'),
+        input: path.join(__dirname, './src/index.js'),
         plugins: plugins.concat([terser()]),
         // sourceMap: true,
         external,
@@ -78,7 +78,7 @@ const bundleList = [
         }
     },
     {
-        input: path.join(__dirname, './index.js'),
+        input: path.join(__dirname, './src/index.js'),
         plugins: plugins,
         // sourceMap: true,
         external,
