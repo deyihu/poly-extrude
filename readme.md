@@ -19,6 +19,7 @@ Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks
 [![](./gallery/slope.png)](https://deyihu.github.io/poly-extrude/test/slope.html)<br>
 
 [![](./gallery/tube.png)](https://deyihu.github.io/poly-extrude/test/tube.html)<br>
+[![](./gallery/terrain.png)](https://deyihu.github.io/poly-extrude/test/terrain.html)<br>
 
 ## Install
 
