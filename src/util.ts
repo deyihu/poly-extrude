@@ -212,7 +212,7 @@ export function generateSideWallUV(uvs, vertices, indexA, indexB, indexC, indexD
 }
 
 export function line2Vectors(line) {
-    const points = [];
+    const points: Vector3[] = [];
     for (let i = 0, len = line.length; i < len; i++) {
         const p = line[i];
         const [x, y, z] = p;

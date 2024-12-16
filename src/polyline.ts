@@ -1,3 +1,4 @@
+import { PolylineType, ResultType } from './type';
 import { calLineDistance, degToRad, generateNormal, generateSideWallUV, merge, radToDeg } from './util';
 
 function checkOptions(options) {
@@ -6,11 +7,22 @@ function checkOptions(options) {
     options.sideDepth = Math.max(0, options.sideDepth);
 }
 
-export function extrudePolylines(lines, options) {
+type PolylineOptions = {
+    depth?: number;
+    lineWidth?: number;
+    bottomStickGround?: boolean;
+    pathUV?: boolean;
+}
+
+type PolylineResult = ResultType & {
+    lines: Array<PolylineType>;
+}
+
+export function extrudePolylines(lines: Array<PolylineType>, options?: PolylineOptions) {
     options = Object.assign({}, { depth: 2, lineWidth: 1, bottomStickGround: false, pathUV: false }, options);
     checkOptions(options);
     const results = lines.map(line => {
-        const result = expandLine(line, options);
+        const result = expandLine(line, options) as Record<string, any>;
         result.line = line;
         generateTopAndBottom(result, options);
         generateSides(result, options);
@@ -20,12 +32,17 @@ export function extrudePolylines(lines, options) {
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
-    const result = merge(results);
+    const result = merge(results) as PolylineResult;
     result.lines = lines;
     return result;
 }
 
-export function extrudeSlopes(lines, options) {
+type SlopeOptions = PolylineOptions & {
+    side?: 'left' | 'right',
+    sideDepth?: number
+}
+
+export function extrudeSlopes(lines: Array<PolylineType>, options?: SlopeOptions): PolylineResult {
     options = Object.assign({}, { depth: 2, lineWidth: 1, side: 'left', sideDepth: 0, bottomStickGround: false, pathUV: false, isSlope: true }, options);
     checkOptions(options);
     const { depth, side, sideDepth } = options;
@@ -33,7 +50,7 @@ export function extrudeSlopes(lines, options) {
         const tempResult = expandLine(line, options);
         tempResult.line = line;
         const { leftPoints, rightPoints } = tempResult;
-        const result = { line };
+        const result: Record<string, any> = { line };
         let depths;
         for (let i = 0, len = line.length; i < len; i++) {
             line[i][2] = line[i][2] || 0;
@@ -56,7 +73,7 @@ export function extrudeSlopes(lines, options) {
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
-    const result = merge(results);
+    const result = merge(results) as PolylineResult;
     result.lines = lines;
     return result;
 }
@@ -80,7 +97,7 @@ function generateTopAndBottom(result, options) {
         }
     }
     let i = 0, len = leftPoints.length;
-    const points = [], indices = [], uv = [];
+    const points: number[] = [], indices: number[] = [], uv: number[] = [];
     while (i < len) {
         // top left
         const idx0 = i * 3;
@@ -296,7 +313,7 @@ export function expandLine(line, options) {
     if (options.isSlope) {
         radius *= 2;
     }
-    const points = [], leftPoints = [], rightPoints = [];
+    const points: Array<number[]> = [], leftPoints: Array<number[]> = [], rightPoints: Array<number[]> = [];
     const len = line.length;
     let i = 0;
     while (i < len) {
@@ -418,7 +435,7 @@ function translateLine(p1, p2, distance) {
  * @param {*} p4
  * @returns
  */
-function lineIntersection(p1, p2, p3, p4) {
+function lineIntersection(p1, p2, p3, p4): Array<number> | null {
     const dx1 = p2[0] - p1[0], dy1 = p2[1] - p1[1];
     const dx2 = p4[0] - p3[0], dy2 = p4[1] - p3[1];
     if (dx1 === 0 && dx2 === 0) {

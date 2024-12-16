@@ -5,6 +5,7 @@ import { babel } from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import { terser } from 'rollup-plugin-terser';
+import typescript from '@rollup/plugin-typescript';
 // import swc from 'rollup-plugin-swc';
 import pkg from './package.json';
 const path = require('path');
@@ -18,6 +19,9 @@ const banner = `/*!\n * ${pkg.name} v${pkg.version}\n  */`;
 // outro = `typeof console !== 'undefined' && console.log('${outro}');`;
 const plugins = [
     json(),
+    typescript({
+
+    }),
     nodeResolve(),
     commonjs(),
     // swc({
@@ -44,7 +48,7 @@ const globals = {
 const name = 'polyextrude';
 const bundleList = [
     {
-        input: path.join(__dirname, './src/index.js'),
+        input: path.join(__dirname, './src/index.ts'),
         plugins: plugins,
         // sourceMap: true,
         external,
@@ -61,7 +65,7 @@ const bundleList = [
         }
     },
     {
-        input: path.join(__dirname, './src/index.js'),
+        input: path.join(__dirname, './src/index.ts'),
         plugins: plugins.concat([terser()]),
         // sourceMap: true,
         external,
@@ -78,7 +82,7 @@ const bundleList = [
         }
     },
     {
-        input: path.join(__dirname, './src/index.js'),
+        input: path.join(__dirname, './src/index.ts'),
         plugins: plugins,
         // sourceMap: true,
         external,

@@ -1,8 +1,27 @@
 
 import earcut from 'earcut';
 import { generateNormal, generateSideWallUV, isClockwise, merge } from './util';
+import { PolylineType, PolygonType, ResultType } from './type';
 
-export function extrudePolygons(polygons, options) {
+type PolygonOptions = {
+    depth?: number
+}
+
+type PolygonResult = ResultType & {
+    polygons: Array<PolygonType>;
+}
+
+type FlatResult = {
+    flatVertices: Float32Array,
+    holes: number[],
+    points: number[],
+    count: number;
+    uv: number[];
+
+}
+
+
+export function extrudePolygons(polygons: Array<PolygonType>, options?: PolygonOptions): PolygonResult {
     options = Object.assign({}, { depth: 2 }, options);
     const results = polygons.map(polygon => {
         for (let i = 0, len = polygon.length; i < len; i++) {
@@ -19,7 +38,7 @@ export function extrudePolygons(polygons, options) {
                 ring.splice(ring.length - 1, 1);
             }
         }
-        const result = flatVertices(polygon, options);
+        const result = flatVertices(polygon, options) as Record<string, any>;
         result.polygon = polygon;
         const triangles = earcut(result.flatVertices, result.holes, 2);
         generateTopAndBottom(result, triangles);
@@ -30,14 +49,14 @@ export function extrudePolygons(polygons, options) {
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
-    const result = merge(results);
+    const result = merge(results) as PolygonResult;
     result.polygons = polygons;
     return result;
 
 }
 
 function generateTopAndBottom(result, triangles) {
-    const indices = [];
+    const indices: number[] = [];
     const { count } = result;
     for (let i = 0, len = triangles.length; i < len; i += 3) {
         // top
@@ -113,10 +132,10 @@ function calPolygonPointsCount(polygon) {
     return count;
 }
 
-function flatVertices(polygon, options) {
+function flatVertices(polygon, options): FlatResult {
     const count = calPolygonPointsCount(polygon);
     const len = polygon.length;
-    const holes = [], flatVertices = new Float32Array(count * 2), points = [], uv = [];
+    const holes: number[] = [], flatVertices = new Float32Array(count * 2), points: number[] = [], uv: number[] = [];
     const pOffset = count * 3, uOffset = count * 2;
     const depth = options.depth;
 
@@ -166,13 +185,13 @@ function flatVertices(polygon, options) {
 
 }
 
-function validateRing(ring) {
+function validateRing(ring: PolylineType) {
     if (!isClosedRing(ring)) {
         ring.push(ring[0]);
     }
 }
 
-function isClosedRing(ring) {
+function isClosedRing(ring: PolylineType) {
     const len = ring.length;
     const [x1, y1] = ring[0], [x2, y2] = ring[len - 1];
     return (x1 === x2 && y1 === y2);

@@ -1,17 +1,30 @@
 import { Vector3 } from './math/Vector3';
 import { PathPoint } from './path/PathPoint';
 import { PathPointList } from './path/PathPointList';
+import { PolylineType, ResultType } from './type';
 import { line2Vectors, merge } from './util';
 const UP = new Vector3(0, 0, 1);
 const normalDir = new Vector3();
 
-export function expandTubes(lines, options) {
+type TubeOptions = {
+    radius?: number;
+    cornerSplit?: number;
+    radialSegments?: number;
+    startRad?: number;
+}
+
+type TubeResult = ResultType & {
+    lines: Array<PolylineType>;
+}
+
+export function expandTubes(lines: Array<PolylineType>, options?: TubeOptions) {
     options = Object.assign({}, { radius: 1, cornerSplit: 0, radialSegments: 8, startRad: -Math.PI / 4 }, options);
     const results = lines.map(line => {
         const points = line2Vectors(line);
         const pathPointList = new PathPointList();
-        pathPointList.set(points, options.cornerRadius, options.cornerSplit, UP);
-        const result = generateTubeVertexData(pathPointList, options);
+        //@ts-ignore
+        pathPointList.set(points, 0, options.cornerSplit, UP);
+        const result = generateTubeVertexData(pathPointList, options) as Record<string, any>;
         result.line = line;
         result.position = new Float32Array(result.points);
         result.indices = new Uint32Array(result.indices);
@@ -19,7 +32,7 @@ export function expandTubes(lines, options) {
         result.normal = new Float32Array(result.normal);
         return result;
     });
-    const result = merge(results);
+    const result = merge(results) as TubeResult;
     result.lines = lines;
     return result;
 }
@@ -42,11 +55,11 @@ function generateTubeVertexData(pathPointList, options) {
     let count = 0;
 
     // modify data
-    const points = [];
-    const normal = [];
-    const uv = [];
+    const points: number[] = [];
+    const normal: number[] = [];
+    const uv: number[] = [];
     // const uv2 = [];
-    const indices = [];
+    const indices: number[] = [];
     let verticesCount = 0;
 
     let pIndex = -1;

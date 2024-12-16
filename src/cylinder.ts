@@ -1,16 +1,29 @@
+import { ResultType } from './type';
 import { generateNormal } from './util';
 
-export function cylinder(point, options = {}) {
+type CylinderOptions = {
+    radius?: number;
+    height?: number;
+    radialSegments?: number;
+}
+
+type CylinderResult = ResultType & {
+    points: Float32Array
+}
+
+export function cylinder(point: [number, number], options?: CylinderOptions): CylinderResult {
     options = Object.assign({}, { radius: 1, height: 2, radialSegments: 6 }, options);
-    const radialSegments = Math.round(Math.max(4, options.radialSegments));
-    const { radius, height } = options;
+    const radialSegments = Math.round(Math.max(4, options.radialSegments as number));
+    let { radius, height } = options;
+    radius = (radius as number);
+    height = (height as number);
     const aRad = 360 / radialSegments / 360 * Math.PI * 2;
     const circlePointsLen = (radialSegments + 1);
     const points = new Float32Array(circlePointsLen * 3 * 2);
     const [centerx, centery] = point;
     let idx = 0, uIdx = 0;
     const offset = circlePointsLen * 3, uOffset = circlePointsLen * 2;
-    const indices = [], uv = [];
+    const indices: number[] = [], uv: number[] = [];
     let iIndex = indices.length - 1;
     for (let i = -1; i < radialSegments; i++) {
         const rad = aRad * i;

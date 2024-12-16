@@ -1,4 +1,6 @@
-export function plane(width, height, devideW, devideH) {
+import { ResultType } from "./type";
+
+export function plane(width: number, height: number, devideW: number, devideH: number): ResultType {
     devideW = Math.max(1, devideW);
     devideH = Math.max(1, devideH);
     const dx = width / devideW, dy = height / devideH;

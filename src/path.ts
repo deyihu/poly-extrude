@@ -1,6 +1,7 @@
 import { Vector3 } from './math/Vector3';
 import { PathPoint } from './path/PathPoint';
 import { PathPointList } from './path/PathPointList';
+import { PolylineType, ResultType } from './type';
 import { line2Vectors, merge } from './util';
 const UP = new Vector3(0, 0, 1);
 
@@ -13,28 +14,43 @@ const rightOffset = new Vector3();
 const tempPoint1 = new Vector3();
 const tempPoint2 = new Vector3();
 
-export function expandPaths(lines, options) {
+type OptionsType = {
+    lineWidth?: number;
+    cornerRadius?: number;
+    cornerSplit?: number;
+}
+
+type PathsResult = ResultType & {
+    lines: Array<PolylineType>;
+}
+
+export function expandPaths(lines: Array<PolylineType>, options?: OptionsType): PathsResult {
     options = Object.assign({}, { lineWidth: 1, cornerRadius: 0, cornerSplit: 10 }, options);
     const results = lines.map(line => {
         const points = line2Vectors(line);
         const pathPointList = new PathPointList();
+        //@ts-ignore
         pathPointList.set(points, options.cornerRadius, options.cornerSplit, UP);
-        const result = generatePathVertexData(pathPointList, options);
-        result.line = line;
-        result.position = new Float32Array(result.position);
-        result.indices = new Uint32Array(result.indices);
-        result.uv = new Float32Array(result.uv);
-        result.normal = new Float32Array(result.normal);
+        const params = generatePathVertexData(pathPointList, options);
+
+        const result = {
+            position: new Float32Array(params.position),
+            indices: new Uint32Array(params.indices),
+            uv: new Float32Array(params.uv),
+            normal: new Float32Array(params.normal),
+            line,
+            count: params.count
+        }
         return result;
     });
-    const result = merge(results);
+    const result = merge(results) as PathsResult;
     result.lines = lines;
     return result;
 }
 
 // Vertex Data Generate Functions
 // code copy from https://github.com/shawn0326/three.path/blob/master/src/PathGeometry.js
-function generatePathVertexData(pathPointList, options) {
+function generatePathVertexData(pathPointList, options: OptionsType) {
     const width = options.lineWidth || 0.1;
     const progress = 1;
     const side = 'both';
@@ -43,21 +59,29 @@ function generatePathVertexData(pathPointList, options) {
     const sideWidth = (side !== 'both' ? width / 2 : width);
     const totalDistance = pathPointList.distance();
     const progressDistance = progress * totalDistance;
+
+    let count = 0;
+
+    // modify data
+    const position: number[] = [];
+    const normal: number[] = [];
+    const uv: number[] = [];
+    const indices: number[] = [];
+    let verticesCount = 0;
+
     if (totalDistance === 0) {
-        return null;
+        return {
+            position: position,
+            normal,
+            uv: uv,
+            indices: indices,
+            count
+        }
     }
 
     const sharpUvOffset = halfWidth / sideWidth;
     // const sharpUvOffset2 = halfWidth / totalDistance;
 
-    let count = 0;
-
-    // modify data
-    const position = [];
-    const normal = [];
-    const uv = [];
-    const indices = [];
-    let verticesCount = 0;
 
     let pIndex = position.length - 1;
     let nIndex = normal.length - 1;
@@ -74,12 +98,13 @@ function generatePathVertexData(pathPointList, options) {
         const up = pathPoint.up;
         const _right = pathPoint.right;
 
+        //@ts-ignore
         if (side !== 'left') {
             right.copy(_right).multiplyScalar(halfWidth * pathPoint.widthScale);
         } else {
             right.set(0, 0, 0);
         }
-
+        //@ts-ignore
         if (side !== 'right') {
             left.copy(_right).multiplyScalar(-halfWidth * pathPoint.widthScale);
         } else {
