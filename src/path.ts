@@ -14,7 +14,7 @@ const rightOffset = new Vector3();
 const tempPoint1 = new Vector3();
 const tempPoint2 = new Vector3();
 
-type OptionsType = {
+type PathsOptions = {
     lineWidth?: number;
     cornerRadius?: number;
     cornerSplit?: number;
@@ -24,7 +24,7 @@ type PathsResult = ResultType & {
     lines: Array<PolylineType>;
 }
 
-export function expandPaths(lines: Array<PolylineType>, options?: OptionsType): PathsResult {
+export function expandPaths(lines: Array<PolylineType>, options?: PathsOptions): PathsResult {
     options = Object.assign({}, { lineWidth: 1, cornerRadius: 0, cornerSplit: 10 }, options);
     const results = lines.map(line => {
         const points = line2Vectors(line);
@@ -50,7 +50,7 @@ export function expandPaths(lines: Array<PolylineType>, options?: OptionsType): 
 
 // Vertex Data Generate Functions
 // code copy from https://github.com/shawn0326/three.path/blob/master/src/PathGeometry.js
-function generatePathVertexData(pathPointList, options: OptionsType) {
+function generatePathVertexData(pathPointList, options: PathsOptions) {
     const width = options.lineWidth || 0.1;
     const progress = 1;
     const side = 'both';

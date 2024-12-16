@@ -3,25 +3,16 @@ import earcut from 'earcut';
 import { generateNormal, generateSideWallUV, isClockwise, merge } from './util';
 import { PolylineType, PolygonType, ResultType } from './type';
 
-type PolygonOptions = {
+type PolygonsOptions = {
     depth?: number
 }
 
-type PolygonResult = ResultType & {
+type PolygonsResult = ResultType & {
     polygons: Array<PolygonType>;
 }
 
-type FlatResult = {
-    flatVertices: Float32Array,
-    holes: number[],
-    points: number[],
-    count: number;
-    uv: number[];
 
-}
-
-
-export function extrudePolygons(polygons: Array<PolygonType>, options?: PolygonOptions): PolygonResult {
+export function extrudePolygons(polygons: Array<PolygonType>, options?: PolygonsOptions): PolygonsResult {
     options = Object.assign({}, { depth: 2 }, options);
     const results = polygons.map(polygon => {
         for (let i = 0, len = polygon.length; i < len; i++) {
@@ -49,7 +40,7 @@ export function extrudePolygons(polygons: Array<PolygonType>, options?: PolygonO
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
-    const result = merge(results) as PolygonResult;
+    const result = merge(results) as PolygonsResult;
     result.polygons = polygons;
     return result;
 
@@ -132,7 +123,7 @@ function calPolygonPointsCount(polygon) {
     return count;
 }
 
-function flatVertices(polygon, options): FlatResult {
+function flatVertices(polygon, options) {
     const count = calPolygonPointsCount(polygon);
     const len = polygon.length;
     const holes: number[] = [], flatVertices = new Float32Array(count * 2), points: number[] = [], uv: number[] = [];

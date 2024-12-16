@@ -6,18 +6,18 @@ import { line2Vectors, merge } from './util';
 const UP = new Vector3(0, 0, 1);
 const normalDir = new Vector3();
 
-type TubeOptions = {
+type TubesOptions = {
     radius?: number;
     cornerSplit?: number;
     radialSegments?: number;
     startRad?: number;
 }
 
-type TubeResult = ResultType & {
+type TubesResult = ResultType & {
     lines: Array<PolylineType>;
 }
 
-export function expandTubes(lines: Array<PolylineType>, options?: TubeOptions) {
+export function expandTubes(lines: Array<PolylineType>, options?: TubesOptions) {
     options = Object.assign({}, { radius: 1, cornerSplit: 0, radialSegments: 8, startRad: -Math.PI / 4 }, options);
     const results = lines.map(line => {
         const points = line2Vectors(line);
@@ -32,7 +32,7 @@ export function expandTubes(lines: Array<PolylineType>, options?: TubeOptions) {
         result.normal = new Float32Array(result.normal);
         return result;
     });
-    const result = merge(results) as TubeResult;
+    const result = merge(results) as TubesResult;
     result.lines = lines;
     return result;
 }

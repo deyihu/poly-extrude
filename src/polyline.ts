@@ -7,18 +7,18 @@ function checkOptions(options) {
     options.sideDepth = Math.max(0, options.sideDepth);
 }
 
-type PolylineOptions = {
+type PolylinesOptions = {
     depth?: number;
     lineWidth?: number;
     bottomStickGround?: boolean;
     pathUV?: boolean;
 }
 
-type PolylineResult = ResultType & {
+type PolylinesResult = ResultType & {
     lines: Array<PolylineType>;
 }
 
-export function extrudePolylines(lines: Array<PolylineType>, options?: PolylineOptions) {
+export function extrudePolylines(lines: Array<PolylineType>, options?: PolylinesOptions): PolylinesResult {
     options = Object.assign({}, { depth: 2, lineWidth: 1, bottomStickGround: false, pathUV: false }, options);
     checkOptions(options);
     const results = lines.map(line => {
@@ -32,17 +32,17 @@ export function extrudePolylines(lines: Array<PolylineType>, options?: PolylineO
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
-    const result = merge(results) as PolylineResult;
+    const result = merge(results) as PolylinesResult;
     result.lines = lines;
     return result;
 }
 
-type SlopeOptions = PolylineOptions & {
+type SlopesOptions = PolylinesOptions & {
     side?: 'left' | 'right',
     sideDepth?: number
 }
 
-export function extrudeSlopes(lines: Array<PolylineType>, options?: SlopeOptions): PolylineResult {
+export function extrudeSlopes(lines: Array<PolylineType>, options?: SlopesOptions): PolylinesResult {
     options = Object.assign({}, { depth: 2, lineWidth: 1, side: 'left', sideDepth: 0, bottomStickGround: false, pathUV: false, isSlope: true }, options);
     checkOptions(options);
     const { depth, side, sideDepth } = options;
@@ -73,7 +73,7 @@ export function extrudeSlopes(lines: Array<PolylineType>, options?: SlopeOptions
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
-    const result = merge(results) as PolylineResult;
+    const result = merge(results) as PolylinesResult;
     result.lines = lines;
     return result;
 }
