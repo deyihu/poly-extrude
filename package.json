@@ -1,6 +1,6 @@
 {
   "name": "poly-extrude",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "",
   "main": "dist/poly-extrude.js",
   "module": "dist/poly-extrude.mjs",
