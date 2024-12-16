@@ -124,6 +124,7 @@ npm i poly-extrude
 ```
 
 ![](./img/extrudePolylines.png)
+
 ### `extrudePolylines(lines, options)`
 
 * `lines`
@@ -147,6 +148,7 @@ npm i poly-extrude
 ```
 
 ![](./img/cylinder.png)
+
 ### `cylinder(center, options)`
 
 * `center`
@@ -174,6 +176,7 @@ const {
 ```
 
 ![](./img/expandPaths.png)
+
 ### `expandPaths(lines, options)`
 
 * `lines`
@@ -230,6 +233,7 @@ const {
 ```
 
 ![](./img/expandTubes.png)
+
 ### `expandTubes(lines, options)`
 
 * `lines`
@@ -243,6 +247,28 @@ const result = expandTubes(polylines, {
     radialSegments: 8
 
 });
+const {
+
+    positon,
+    normal,
+    uv,
+    indices
+
+} = result;
+//do something
+```
+
+![](./img/plane.png)
+
+### `plane(width, height,devideW,devideH)`
+
+* `width`
+* `height`
+* `devideW`
+* `devideH`
+
+```js
+const result = plane(100,100,10,10);
 const {
 
     positon,
