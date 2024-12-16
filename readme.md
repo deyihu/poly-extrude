@@ -44,7 +44,8 @@ npm i poly-extrude
       cylinder,
       expandPaths,
       extrudeSlopes,
-      expandTubes
+      expandTubes,
+      plane
   } from 'poly-extrude';
 
   //if you use cdn,the namespace is polyextrude
@@ -134,6 +135,8 @@ npm i poly-extrude
 * `options.bottomStickGround`  Is the bottom attached to the ground 
 * `options.pathUV`  generate Path UV
 
+[extrudePolylines pathUV demo](https://deyihu.github.io/poly-extrude/test/line-pathuv.html)
+
 ```js
    const result = extrudePolylines(polylines, {
        depth: 2,
@@ -213,6 +216,9 @@ const {
 * `options.bottomStickGround` Is the bottom attached to the ground
 * `options.pathUV`  generate Path UV
 
+
+[extrudeSlopes pathUV demo](https://deyihu.github.io/poly-extrude/test/slope-pathuv.html)
+
 ```js
 const result = extrudeSlopes(polylines, {
 
@@ -268,8 +274,11 @@ const {
 * `devideW`
 * `devideH`
 
+[plane demo](https://deyihu.github.io/poly-extrude/test/plane.html)  
+[custom terrain demo](https://deyihu.github.io/poly-extrude/test/terrain.html)
+
 ```js
-const result = plane(100,100,10,10);
+const result = plane(100, 100, 10, 10);
 const {
 
     positon,
