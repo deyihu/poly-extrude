@@ -27,7 +27,9 @@
 
 <body>
     <script>
-        const scene = createScene();
+        const scene = createScene({
+            lightIntensity: 0.6
+        });
 
         const size = 100;
         function getTexture() {

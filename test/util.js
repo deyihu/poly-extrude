@@ -90,7 +90,8 @@ function createBufferGeometry(result) {
 }
 
 // eslint-disable-next-line no-unused-vars
-function createScene() {
+function createScene(options = {}) {
+    options = Object.assign({}, { lightIntensity: 0.8 }, options);
     const THREE = window.THREE;
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xb0b0b0);
@@ -105,7 +106,7 @@ function createScene() {
     directionalLight.position.set(0.75, -1.75, 10.0).normalize();
     scene.add(directionalLight);
 
-    const ambientLight = new THREE.AmbientLight('#FFF', 0.5);
+    const ambientLight = new THREE.AmbientLight('#FFF', options.lightIntensity);
     scene.add(ambientLight);
 
     // const pointLight = new THREE.PointLight('#fff', 0.2);
