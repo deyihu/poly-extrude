@@ -12,7 +12,7 @@ const path = require('path');
 
 const product = process.env.NODE_ENV.trim() === 'prd';
 const FILEMANE = pkg.name;
-const sourceMap = !product;
+// const sourceMap = !product;
 
 const banner = `/*!\n * ${pkg.name} v${pkg.version}\n  */`;
 // let outro = pkg.name + ' v' + pkg.version;
@@ -46,9 +46,11 @@ const globals = {
 
 };
 const name = 'polyextrude';
+
+const input = path.join(__dirname, './src/index.ts');
 const bundleList = [
     {
-        input: path.join(__dirname, './src/index.ts'),
+        input,
         plugins: plugins,
         // sourceMap: true,
         external,
@@ -57,7 +59,7 @@ const bundleList = [
             'format': 'umd',
             'name': name,
             'file': `dist/${FILEMANE}.js`,
-            'sourcemap': sourceMap,
+            'sourcemap': true,
             'extend': true,
             'banner': banner,
             // 'outro': outro,
@@ -65,7 +67,7 @@ const bundleList = [
         }
     },
     {
-        input: path.join(__dirname, './src/index.ts'),
+        input,
         plugins: plugins.concat([terser()]),
         // sourceMap: true,
         external,
@@ -82,7 +84,7 @@ const bundleList = [
         }
     },
     {
-        input: path.join(__dirname, './src/index.ts'),
+        input,
         plugins: plugins,
         // sourceMap: true,
         external,
@@ -91,7 +93,7 @@ const bundleList = [
             'format': 'es',
             'name': name,
             'file': `dist/${FILEMANE}.mjs`,
-            'sourcemap': false,
+            'sourcemap': true,
             'extend': true,
             'banner': banner,
             // 'outro': outro,

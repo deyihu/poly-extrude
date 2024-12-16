@@ -4,11 +4,12 @@
   "description": "",
   "main": "dist/poly-extrude.js",
   "module": "dist/poly-extrude.mjs",
+  "types": "dist/index.d.ts",
   "scripts": {
     "tsc": "npx tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/**/*.js",
-    "build": "npm run lint && cross-env NODE_ENV=prd  rollup -c",
+    "build": "npm run lint && npm run tsc  && cross-env NODE_ENV=prd  rollup -c",
     "dev": "npm run lint && cross-env NODE_ENV=dev  rollup -c -w"
   },
   "repository": {
