@@ -1,11 +1,12 @@
 import { Vector3 } from './math/Vector3';
+import { PolylineType, ResultType } from './type';
 
 /**
  * https://github.com/Turfjs/turf/blob/master/packages/turf-boolean-clockwise/index.ts
  * @param {*} ring
  * @returns
  */
-export function isClockwise(ring) {
+export function isClockwise(ring: PolylineType) {
     let sum = 0;
     let i = 1;
     let prev;
@@ -108,7 +109,7 @@ export function generateNormal(indices, position) {
     return normals;
 }
 
-export function merge(results) {
+export function merge(results: Array<ResultType>) {
     if (results.length === 1) {
         const result = {
             position: results[0].position,

@@ -4,4 +4,10 @@ import { cylinder } from './cylinder';
 import { expandPaths } from './path';
 import { expandTubes } from './tube';
 import { plane } from './plane';
-export { extrudePolygons, extrudePolylines, extrudeSlopes, expandLine, leftOnLine, cylinder, expandPaths, expandTubes, plane };
+import { isClockwise, merge } from './util';
+export {
+    isClockwise, merge,
+    extrudePolygons, extrudePolylines,
+    extrudeSlopes, expandLine, leftOnLine,
+    cylinder, expandPaths, expandTubes, plane
+};

@@ -32,7 +32,7 @@ export function expandTubes(lines: Array<PolylineType>, options?: TubesOptions) 
         result.normal = new Float32Array(result.normal);
         return result;
     });
-    const result = merge(results) as TubesResult;
+    const result = merge(results as Array<ResultType>) as TubesResult;
     result.lines = lines;
     return result;
 }

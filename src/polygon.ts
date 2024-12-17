@@ -40,7 +40,7 @@ export function extrudePolygons(polygons: Array<PolygonType>, options?: Polygons
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
-    const result = merge(results) as PolygonsResult;
+    const result = merge(results as Array<ResultType>) as PolygonsResult;
     result.polygons = polygons;
     return result;
 
