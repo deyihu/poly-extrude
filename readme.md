@@ -111,6 +111,7 @@ npm i poly-extrude
 
 * `polygons`
 * `options.depth`
+* `options.top` Whether to display the top
 
 ```js
   const result = extrudePolygons(polygons, {
@@ -215,7 +216,6 @@ const {
 * `options.sideDepth` slope depth 
 * `options.bottomStickGround` Is the bottom attached to the ground
 * `options.pathUV`  generate Path UV
-
 
 [extrudeSlopes pathUV demo](https://deyihu.github.io/poly-extrude/test/slope-pathuv.html)
 
