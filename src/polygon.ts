@@ -4,7 +4,8 @@ import { generateNormal, generateSideWallUV, isClockwise, merge } from './util';
 import { PolylineType, PolygonType, ResultType } from './type';
 
 type PolygonsOptions = {
-    depth?: number
+    depth?: number,
+    top?: boolean
 }
 
 type PolygonsResult = ResultType & {
@@ -13,7 +14,7 @@ type PolygonsResult = ResultType & {
 
 
 export function extrudePolygons(polygons: Array<PolygonType>, options?: PolygonsOptions): PolygonsResult {
-    options = Object.assign({}, { depth: 2 }, options);
+    options = Object.assign({}, { depth: 2, top: true }, options);
     const results = polygons.map(polygon => {
         for (let i = 0, len = polygon.length; i < len; i++) {
             const ring = polygon[i];
@@ -32,7 +33,7 @@ export function extrudePolygons(polygons: Array<PolygonType>, options?: Polygons
         const result = flatVertices(polygon, options) as Record<string, any>;
         result.polygon = polygon;
         const triangles = earcut(result.flatVertices, result.holes, 2);
-        generateTopAndBottom(result, triangles);
+        generateTopAndBottom(result, triangles, options);
         generateSides(result, options);
         result.position = new Float32Array(result.points);
         result.indices = new Uint32Array(result.indices);
@@ -46,18 +47,24 @@ export function extrudePolygons(polygons: Array<PolygonType>, options?: Polygons
 
 }
 
-function generateTopAndBottom(result, triangles) {
+function generateTopAndBottom(result, triangles, options: PolygonsOptions) {
     const indices: number[] = [];
     const { count } = result;
+    const top = options.top;
     for (let i = 0, len = triangles.length; i < len; i += 3) {
         // top
         const a = triangles[i], b = triangles[i + 1], c = triangles[i + 2];
-        indices[i] = a;
-        indices[i + 1] = b;
-        indices[i + 2] = c;
+        if (top) {
+            indices[i] = a;
+            indices[i + 1] = b;
+            indices[i + 2] = c;
+        }
         // bottom
-        const idx = len + i;
+        let idx = len + i;
         const a1 = count + a, b1 = count + b, c1 = count + c;
+        if (!top) {
+            idx = i;
+        }
         indices[idx] = a1;
         indices[idx + 1] = b1;
         indices[idx + 2] = c1;
