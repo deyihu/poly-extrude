@@ -224,7 +224,7 @@ function createTerrain(imageData) {
         const z2 = positionarray[indexb];
         const z3 = positionarray[indexc];
         if (z1 !== errorZ || z2 !== errorZ || z3 !== errorZ) {
-            filterIndex.push(a, b, c);
+            // filterIndex.push(a, b, c);
             filterIndex[++pIndex] = a;
             filterIndex[++pIndex] = b;
             filterIndex[++pIndex] = c;
