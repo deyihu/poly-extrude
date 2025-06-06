@@ -21,6 +21,8 @@ Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks
 [![](./gallery/tube.png)](https://deyihu.github.io/poly-extrude/test/tube.html)<br>
 [![](./gallery/terrain.png)](https://deyihu.github.io/poly-extrude/test/terrain.html)<br>
 
+[shape demo ](https://deyihu.github.io/poly-extrude/test/shape.html)<br>
+
 ## Install
 
 ### NPM
