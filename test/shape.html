@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name=renderer content=webkit>
+<script type="text/javascript" src="https://unpkg.com/@maptalks/geojson-bbox@1.0.4/dist/bbox.umd.js"></script>
+<script type="text/javascript" src="https://unpkg.com/three@0.138.0/build/three.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/three@0.142.0/examples/js/controls/OrbitControls.js"></script>
+<script type="text/javascript" src="https://unpkg.com/poly-extrude/dist/poly-extrude.js"></script>
+<script type="text/javascript" src="./util.js"></script>
+<!-- <script type="text/javascript" src="http://localhost/geometry-extrude/dist/geometry-extrude.js"></script> -->
+
+<style type="text/css">
+    html,
+    body {
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .container {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <script>
+        const scene = createScene();
+
+
+        const smileyShape = new THREE.Shape()
+            .moveTo(80, 40)
+            .absarc(40, 40, 40, 0, Math.PI * 2, false);
+
+        const smileyEye1Path = new THREE.Path()
+            .moveTo(35, 20)
+            .absellipse(25, 20, 10, 10, 0, Math.PI * 2, true);
+
+        const smileyEye2Path = new THREE.Path()
+            .moveTo(65, 20)
+            .absarc(55, 20, 10, 0, Math.PI * 2, true);
+
+        const smileyMouthPath = new THREE.Path()
+            .moveTo(20, 40)
+            .quadraticCurveTo(40, 60, 60, 40)
+            .bezierCurveTo(70, 45, 70, 50, 60, 60)
+            .quadraticCurveTo(40, 80, 20, 60)
+            .quadraticCurveTo(5, 50, 20, 40);
+
+        smileyShape.holes.push(smileyEye1Path);
+        smileyShape.holes.push(smileyEye2Path);
+        smileyShape.holes.push(smileyMouthPath);
+
+        // console.log(smileyShape.extractPoints(3));
+
+        function createRing(ring) {
+            return ring.map(v => {
+                return [v.x, v.y]
+            })
+        }
+
+        function createPolygon(result) {
+            const { shape, holes } = result;
+            return [
+                createRing(shape),
+                ...holes.map(ring => {
+                    return createRing(ring)
+                })
+            ]
+        }
+
+        function test() {
+
+            const polygon = createPolygon(smileyShape.extractPoints(3))
+            console.log(polygon);
+
+            const time = 'time';
+            console.time(time);
+            const result = polyextrude.extrudePolygons([polygon], { depth: 4 });
+
+            console.timeEnd(time);
+            console.log(result);
+            const geometry = createBufferGeometry(result);
+            const mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: '#FFF', wireframe: false, vertexColors: false }));
+            scene.add(mesh);
+        }
+        test();
+
+
+
+    </script>
+</body>
+
+</html>
