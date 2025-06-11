@@ -143,9 +143,13 @@ function generatePolygonOnPathVertexData(pathPointList, polygon: PolygonType, ce
             v.y *= radius;
             v.z *= radius;
 
-            points[++pIndex] = pathPoint.pos.x + v.x;
-            points[++pIndex] = pathPoint.pos.y + v.y;
-            points[++pIndex] = pathPoint.pos.z + v.z;
+            const x = pathPoint.pos.x + v.x;
+            const y = pathPoint.pos.y + v.y;
+            const z = pathPoint.pos.z + v.z;
+
+            points[++pIndex] = x;
+            points[++pIndex] = y;
+            points[++pIndex] = z;
 
             // if (i === 0 || i === radialSegments - 1) {
             //     console.log(i, radialSegments, v.x, v.y, v.z);
@@ -163,15 +167,15 @@ function generatePolygonOnPathVertexData(pathPointList, polygon: PolygonType, ce
 
             if (first && !isLast) {
                 let index = startPoints.length - 1;
-                startPoints[++index] = pathPoint.pos.x + v.x;
-                startPoints[++index] = pathPoint.pos.y + v.y;
-                startPoints[++index] = pathPoint.pos.z + v.z;
+                startPoints[++index] = x;
+                startPoints[++index] = y;
+                startPoints[++index] = z;
             }
             if (end && !isLast) {
                 let index = endPoints.length - 1;
-                endPoints[++index] = pathPoint.pos.x + v.x;
-                endPoints[++index] = pathPoint.pos.y + v.y;
-                endPoints[++index] = pathPoint.pos.z + v.z;
+                endPoints[++index] = x;
+                endPoints[++index] = y;
+                endPoints[++index] = z;
             }
         }
 
