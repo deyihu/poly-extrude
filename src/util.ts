@@ -1,6 +1,12 @@
 import { Vector3 } from './math/Vector3';
-import { PolylineType, ResultType } from './type';
+import { PolygonType, PolylineType, ResultType } from './type';
 
+export function mergeArray(array1, array2) {
+    let index = array1.length - 1;
+    for (let i = 0, len = array2.length; i < len; i++) {
+        array1[++index] = array2[i];
+    }
+}
 /**
  * https://github.com/Turfjs/turf/blob/master/packages/turf-boolean-clockwise/index.ts
  * @param {*} ring
@@ -20,6 +26,67 @@ export function isClockwise(ring: PolylineType) {
         i++;
     }
     return sum > 0;
+}
+
+
+export function validateRing(ring: PolylineType) {
+    if (!isClosedRing(ring)) {
+        ring.push(ring[0]);
+    }
+}
+
+export function isClosedRing(ring: PolylineType) {
+    const len = ring.length;
+    const [x1, y1] = ring[0], [x2, y2] = ring[len - 1];
+    return (x1 === x2 && y1 === y2);
+}
+
+export function calPolygonPointsCount(polygon: PolygonType) {
+    let count = 0;
+    let i = 0;
+    const len = polygon.length;
+    while (i < len) {
+        count += (polygon[i].length);
+        i++;
+    }
+    return count;
+}
+
+export function getPolygonsBBOX(polygons, bbox?) {
+    bbox = bbox || [Infinity, Infinity, -Infinity, -Infinity];
+    for (let i = 0, len = polygons.length; i < len; i++) {
+        const p = polygons[i];
+        if (Array.isArray(p[0][0])) {
+            getPolygonsBBOX(p, bbox);
+        } else {
+            for (let j = 0, len1 = p.length; j < len1; j++) {
+                const c = p[j];
+                const [x, y] = c;
+                bbox[0] = Math.min(bbox[0], x);
+                bbox[1] = Math.min(bbox[1], y);
+                bbox[2] = Math.max(bbox[2], x);
+                bbox[3] = Math.max(bbox[3], y);
+            }
+        }
+    }
+    return bbox;
+}
+
+export function validatePolygon(polygon: PolygonType) {
+    for (let i = 0, len = polygon.length; i < len; i++) {
+        const ring = polygon[i];
+        validateRing(ring);
+        if (i === 0) {
+            if (!isClockwise(ring)) {
+                polygon[i] = ring.reverse();
+            }
+        } else if (isClockwise(ring)) {
+            polygon[i] = ring.reverse();
+        }
+        if (isClosedRing(ring)) {
+            ring.splice(ring.length - 1, 1);
+        }
+    }
 }
 
 function v3Sub(out, v1, v2) {

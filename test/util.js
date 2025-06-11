@@ -91,7 +91,7 @@ function createBufferGeometry(result) {
 
 // eslint-disable-next-line no-unused-vars
 function createScene(options = {}) {
-    options = Object.assign({}, { lightIntensity: 0.8 }, options);
+    options = Object.assign({}, { lightIntensity: 0.75 }, options);
     const THREE = window.THREE;
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xb0b0b0);
@@ -117,6 +117,10 @@ function createScene(options = {}) {
     const helper = new THREE.GridHelper(200, 10);
     helper.rotation.x = Math.PI / 2;
     scene.add(helper);
+
+    const axisHelper = new THREE.AxesHelper(100);
+    // const axisHelper = THREE.AxisHelper(1000);
+    scene.add(axisHelper);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);

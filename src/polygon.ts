@@ -1,6 +1,6 @@
 
 import earcut from 'earcut';
-import { generateNormal, generateSideWallUV, isClockwise, merge } from './util';
+import { generateNormal, generateSideWallUV, isClockwise, merge, isClosedRing, validateRing, calPolygonPointsCount, validatePolygon } from './util';
 import { PolylineType, PolygonType, ResultType } from './type';
 
 type PolygonsOptions = {
@@ -16,20 +16,7 @@ type PolygonsResult = ResultType & {
 export function extrudePolygons(polygons: Array<PolygonType>, options?: PolygonsOptions): PolygonsResult {
     options = Object.assign({}, { depth: 2, top: true }, options);
     const results = polygons.map(polygon => {
-        for (let i = 0, len = polygon.length; i < len; i++) {
-            const ring = polygon[i];
-            validateRing(ring);
-            if (i === 0) {
-                if (!isClockwise(ring)) {
-                    polygon[i] = ring.reverse();
-                }
-            } else if (isClockwise(ring)) {
-                polygon[i] = ring.reverse();
-            }
-            if (isClosedRing(ring)) {
-                ring.splice(ring.length - 1, 1);
-            }
-        }
+        validatePolygon(polygon);
         const result = flatVertices(polygon, options) as Record<string, any>;
         result.polygon = polygon;
         const triangles = earcut(result.flatVertices, result.holes, 2);
@@ -119,16 +106,6 @@ function generateSides(result, options) {
     }
 }
 
-function calPolygonPointsCount(polygon) {
-    let count = 0;
-    let i = 0;
-    const len = polygon.length;
-    while (i < len) {
-        count += (polygon[i].length);
-        i++;
-    }
-    return count;
-}
 
 function flatVertices(polygon, options) {
     const count = calPolygonPointsCount(polygon);
@@ -183,14 +160,55 @@ function flatVertices(polygon, options) {
 
 }
 
-function validateRing(ring: PolylineType) {
-    if (!isClosedRing(ring)) {
-        ring.push(ring[0]);
+
+function simplePolygon(polygon, options = {}) {
+    const flatVertices = [], holes = [];
+    let pIndex = -1, aIndex = -1, uvIndex = -1;
+    const points = [], uv = [];
+    for (let i = 0, len = polygon.length; i < len; i++) {
+        const ring = polygon[i];
+        if (i > 0) {
+            holes.push(flatVertices.length / 2);
+        }
+        for (let j = 0, len1 = ring.length; j < len1; j++) {
+            const c = ring[j];
+            flatVertices[++pIndex] = c[0];
+            flatVertices[++pIndex] = c[1];
+
+            points[++aIndex] = c[0];
+            points[++aIndex] = c[1];
+            points[++aIndex] = c[2] || 0;
+
+            uv[++uvIndex] = c[0];
+            uv[++uvIndex] = c[1];
+        }
+    }
+    const triangles = earcut(flatVertices, holes, 2);
+    const normal = generateNormal(triangles, points);
+    return {
+        normal,
+        uv,
+        points,
+        indices: triangles
     }
 }
 
-function isClosedRing(ring: PolylineType) {
-    const len = ring.length;
-    const [x1, y1] = ring[0], [x2, y2] = ring[len - 1];
-    return (x1 === x2 && y1 === y2);
+export function polygons(polygons, options = {}): PolygonsResult {
+    const results = polygons.map(polygon => {
+        validatePolygon(polygon);
+
+        const result = simplePolygon(polygon, options) as Record<string, any>;
+        result.polygon = polygon;
+        result.position = new Float32Array(result.points);
+        result.indices = new Uint32Array(result.indices);
+        result.uv = new Float32Array(result.uv);
+        result.normal = new Float32Array(result.normal);
+        return result;
+    });
+    const result = merge(results as Array<ResultType>) as PolygonsResult;
+    result.polygons = polygons;
+    return result;
+
+
+
 }
