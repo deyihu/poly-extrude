@@ -116,7 +116,6 @@ npm i poly-extrude
 
 * `polygons`
 * `options.depth`
-
 * `options.top` Whether to display the top
 
 ```js
@@ -141,7 +140,6 @@ ___
 * `polygons`
 * `options.extrudePath` is line
 * `options.openEnd`
-
 * `options.openEndUV`
 
 ```js
@@ -160,9 +158,9 @@ ___
   //do something
 ```
 
-[base demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path.html)
-[with holes demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole1.html)
-[extrude along spring](https://deyihu.github.io/poly-extrude/test/polygon-on-path-spring.html)
+[base demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path.html)  
+[with holes demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole1.html)  
+[extrude along spring](https://deyihu.github.io/poly-extrude/test/polygon-on-path-spring.html)  
 
 
 ___
