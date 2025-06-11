@@ -41,7 +41,9 @@ npm i poly-extrude
 
 ```js
   import {
+      polygons,
       extrudePolygons,
+      extrudePolygonsOnPath,
       extrudePolylines,
       cylinder,
       expandPaths,
@@ -107,12 +109,14 @@ npm i poly-extrude
 
 ## API
 
+
 ![](./img/extrudePolygons.png)
 
 ### `extrudePolygons(polygons, options)`
 
 * `polygons`
 * `options.depth`
+
 * `options.top` Whether to display the top
 
 ```js
@@ -127,6 +131,42 @@ npm i poly-extrude
   } = result;
   //do something
 ```
+
+___
+
+![](./img/extrudepolygonsonpath.png)
+
+### `extrudePolygonsOnPath(polygons, options)`
+
+* `polygons`
+* `options.extrudePath` is line
+* `options.openEnd`
+
+* `options.openEndUV`
+
+```js
+  const result = extrudePolygonsOnPath(polygons, {
+      extrudePath: [
+          [0, 0],
+          [100, 0]
+      ]
+  });
+  const {
+      positon,
+      normal,
+      uv,
+      indices
+  } = result;
+  //do something
+```
+
+[base demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path.html)
+[with holes demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole.html)
+[extrude along spring](https://deyihu.github.io/poly-extrude/test/polygon-on-path-spring.html)
+
+
+___
+
 
 ![](./img/extrudePolylines.png)
 
@@ -153,6 +193,10 @@ npm i poly-extrude
    } = result;
    //do something
 ```
+
+
+___
+
 
 ![](./img/cylinder.png)
 
@@ -182,6 +226,10 @@ const {
 //do something
 ```
 
+___
+
+
+
 ![](./img/expandPaths.png)
 
 ### `expandPaths(lines, options)`
@@ -206,6 +254,10 @@ const {
 } = result;
 //do something
 ```
+
+
+___
+
 
 ![](./img/extrudeSlopes.png)
 
@@ -241,6 +293,8 @@ const {
 //do something
 ```
 
+___
+
 ![](./img/expandTubes.png)
 
 ### `expandTubes(lines, options)`
@@ -267,6 +321,8 @@ const {
 //do something
 ```
 
+___
+
 ![](./img/plane.png)
 
 ### `plane(width, height,devideW,devideH)`
@@ -291,3 +347,26 @@ const {
 } = result;
 //do something
 ```
+
+___
+
+![](./img/polygons.png)
+
+### `polygons(polygons, options)`
+
+* `polygons`
+
+```js
+  const result = polygons(polygons, {
+
+  });
+  const {
+      positon,
+      normal,
+      uv,
+      indices
+  } = result;
+  //do something
+```
+
+[polygons demo](https://deyihu.github.io/poly-extrude/test/simplepolygon.html)
