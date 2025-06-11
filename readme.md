@@ -161,7 +161,7 @@ ___
 ```
 
 [base demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path.html)
-[with holes demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole.html)
+[with holes demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole1.html)
 [extrude along spring](https://deyihu.github.io/poly-extrude/test/polygon-on-path-spring.html)
 
 
