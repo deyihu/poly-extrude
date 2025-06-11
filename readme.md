@@ -2,7 +2,7 @@
 
 Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks/maptalks.three) project<br>
 
-## Examples
+<!-- ## Examples
 
 [![](./gallery/building.png)](https://deyihu.github.io/poly-extrude/test/building.html)
 
@@ -21,7 +21,7 @@ Extrude polygons/polylines. Born in [maptalks.three](https://github.com/maptalks
 [![](./gallery/tube.png)](https://deyihu.github.io/poly-extrude/test/tube.html)<br>
 [![](./gallery/terrain.png)](https://deyihu.github.io/poly-extrude/test/terrain.html)<br>
 
-[shape demo ](https://deyihu.github.io/poly-extrude/test/shape.html)<br>
+[shape demo ](https://deyihu.github.io/poly-extrude/test/shape.html)<br> -->
 
 ## Install
 
@@ -130,6 +130,12 @@ npm i poly-extrude
   } = result;
   //do something
 ```
+[building](https://deyihu.github.io/poly-extrude/test/building.html)  
+[buildings](https://deyihu.github.io/poly-extrude/test/buildings.html)  
+[china](https://deyihu.github.io/poly-extrude/test/china.html)  
+[muti polygon](https://deyihu.github.io/poly-extrude/test/multi-polygon.html)  
+[ny buildings](https://deyihu.github.io/poly-extrude/test/ny-building.html)  
+[custom shape](https://deyihu.github.io/poly-extrude/test/shape.html)  
 
 ___
 
@@ -159,8 +165,10 @@ ___
 ```
 
 [base demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path.html)  
-[with holes demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole1.html)  
+[with holes demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole.html)  
+[with holes by custom shape](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole1.html)  
 [extrude along spring](https://deyihu.github.io/poly-extrude/test/polygon-on-path-spring.html)  
+[extrude taihu lake](https://deyihu.github.io/poly-extrude/test/polygon-on-path-taihu.html)  
 
 
 ___
@@ -191,6 +199,17 @@ ___
    } = result;
    //do something
 ```
+[line](https://deyihu.github.io/poly-extrude/test/line.html)  
+[line uv](https://deyihu.github.io/poly-extrude/test/line-uv.html)  
+[line pathUV](https://deyihu.github.io/poly-extrude/test/line-pathuv.html)  
+[brige](https://deyihu.github.io/poly-extrude/test/brige.html)  
+[brige bottomStickGround](https://deyihu.github.io/poly-extrude/test/brige-bottomStickGround.html)  
+[extrude brige](https://deyihu.github.io/poly-extrude/test/extrudepolyline-brige.html)  
+[spring](https://deyihu.github.io/poly-extrude/test/spring.html)  
+[wall](https://deyihu.github.io/poly-extrude/test/wall.html)  
+[street](https://deyihu.github.io/poly-extrude/test/street.html)  
+
+
 
 
 ___
@@ -223,7 +242,7 @@ const {
 } = result;
 //do something
 ```
-
+[cylinder](https://deyihu.github.io/poly-extrude/test/cylinder.html)  
 ___
 
 
@@ -253,7 +272,9 @@ const {
 //do something
 ```
 
-
+[paths](https://deyihu.github.io/poly-extrude/test/expand-path.html)  
+[street paths](https://deyihu.github.io/poly-extrude/test/expand-path-street.html)  
+[brige paths](https://deyihu.github.io/poly-extrude/test/expand-paths-brige.html)  
 ___
 
 
@@ -269,7 +290,6 @@ ___
 * `options.bottomStickGround` Is the bottom attached to the ground
 * `options.pathUV`  generate Path UV
 
-[extrudeSlopes pathUV demo](https://deyihu.github.io/poly-extrude/test/slope-pathuv.html)
 
 ```js
 const result = extrudeSlopes(polylines, {
@@ -291,6 +311,8 @@ const {
 //do something
 ```
 
+[slope](https://deyihu.github.io/poly-extrude/test/slope.html)  
+[extrudeSlopes pathUV demo](https://deyihu.github.io/poly-extrude/test/slope-pathuv.html)  
 ___
 
 ![](./img/expandTubes.png)
@@ -319,6 +341,7 @@ const {
 //do something
 ```
 
+[tube](https://deyihu.github.io/poly-extrude/test/tube.html)  
 ___
 
 ![](./img/plane.png)
@@ -330,8 +353,6 @@ ___
 * `devideW`
 * `devideH`
 
-[plane demo](https://deyihu.github.io/poly-extrude/test/plane.html)  
-[custom terrain demo](https://deyihu.github.io/poly-extrude/test/terrain.html)
 
 ```js
 const result = plane(100, 100, 10, 10);
@@ -345,6 +366,9 @@ const {
 } = result;
 //do something
 ```
+
+[plane demo](https://deyihu.github.io/poly-extrude/test/plane.html)  
+[custom terrain demo](https://deyihu.github.io/poly-extrude/test/terrain.html)
 
 ___
 
