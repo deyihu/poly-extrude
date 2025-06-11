@@ -16,7 +16,7 @@ type PolygonsResult = ResultType & {
 export function extrudePolygons(polygons: Array<PolygonType>, options?: PolygonsOptions): PolygonsResult {
     options = Object.assign({}, { depth: 2, top: true }, options);
     const results = polygons.map(polygon => {
-        validatePolygon(polygon);
+        validatePolygon(polygon, true);
         const result = flatVertices(polygon, options) as Record<string, any>;
         result.polygon = polygon;
         const triangles = earcut(result.flatVertices, result.holes, 2);
@@ -195,7 +195,7 @@ function simplePolygon(polygon, options = {}) {
 
 export function polygons(polygons, options = {}): PolygonsResult {
     const results = polygons.map(polygon => {
-        validatePolygon(polygon);
+        validatePolygon(polygon, true);
 
         const result = simplePolygon(polygon, options) as Record<string, any>;
         result.polygon = polygon;

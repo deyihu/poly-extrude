@@ -2,7 +2,7 @@ import { Vector3 } from './math/Vector3';
 import { PathPoint } from './path/PathPoint';
 import { PathPointList } from './path/PathPointList';
 import { PolygonType, PolylineType, ResultType } from './type';
-import { generateNormal, isClockwise, line2Vectors, merge, validateRing, isClosedRing, calPolygonPointsCount, getPolygonsBBOX, mergeArray } from './util';
+import { generateNormal, isClockwise, line2Vectors, merge, validateRing, isClosedRing, calPolygonPointsCount, getPolygonsBBOX, mergeArray, validatePolygon } from './util';
 import earcut from 'earcut';
 const UP = new Vector3(0, 0, 1);
 const normalDir = new Vector3();
@@ -38,18 +38,7 @@ export function extrudePolygonsOnPath(polygons: Array<PolygonType>, options?: Po
     pathPointList.set(points, 0, options.cornerSplit, UP);
 
     const results = polygons.map(polygon => {
-        for (let i = 0, len = polygon.length; i < len; i++) {
-            const ring = polygon[i];
-            validateRing(ring);
-            if (i === 0) {
-                if (!isClockwise(ring)) {
-                    polygon[i] = ring.reverse();
-                }
-            } else if (isClockwise(ring)) {
-                polygon[i] = ring.reverse();
-            }
-        }
-
+        validatePolygon(polygon, false);
         const result = generatePolygonOnPathVertexData(pathPointList, polygon, center) as Record<string, any>;
         if (!openEnd) {
             generateStartAndEnd(result, polygon, options);

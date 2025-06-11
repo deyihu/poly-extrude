@@ -72,7 +72,7 @@ export function getPolygonsBBOX(polygons, bbox?) {
     return bbox;
 }
 
-export function validatePolygon(polygon: PolygonType) {
+export function validatePolygon(polygon: PolygonType, ignoreEndPoint: boolean) {
     for (let i = 0, len = polygon.length; i < len; i++) {
         const ring = polygon[i];
         validateRing(ring);
@@ -83,8 +83,10 @@ export function validatePolygon(polygon: PolygonType) {
         } else if (isClockwise(ring)) {
             polygon[i] = ring.reverse();
         }
-        if (isClosedRing(ring)) {
-            ring.splice(ring.length - 1, 1);
+        if (ignoreEndPoint) {
+            if (isClosedRing(ring)) {
+                ring.splice(ring.length - 1, 1);
+            }
         }
     }
 }
