@@ -184,8 +184,6 @@ ___
 * `options.bottomStickGround`  Is the bottom attached to the ground 
 * `options.pathUV`  generate Path UV
 
-[extrudePolylines pathUV demo](https://deyihu.github.io/poly-extrude/test/line-pathuv.html)
-
 ```js
    const result = extrudePolylines(polylines, {
        depth: 2,
@@ -312,7 +310,7 @@ const {
 ```
 
 [slope](https://deyihu.github.io/poly-extrude/test/slope.html)  
-[extrudeSlopes pathUV demo](https://deyihu.github.io/poly-extrude/test/slope-pathuv.html)  
+[extrudeSlopes pathUV demo](https://deyihu.github.io/poly-extrude/test/slope-pathuv.html)   
 ___
 
 ![](./img/expandTubes.png)
@@ -368,7 +366,7 @@ const {
 ```
 
 [plane demo](https://deyihu.github.io/poly-extrude/test/plane.html)  
-[custom terrain demo](https://deyihu.github.io/poly-extrude/test/terrain.html)
+[custom terrain demo](https://deyihu.github.io/poly-extrude/test/terrain.html)  
 
 ___
 
