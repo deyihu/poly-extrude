@@ -31,7 +31,7 @@
 
         function test() {
 
-            getGeoJSON('./data/鄱阳湖.geojson').then(geojson => {
+            getGeoJSON('./data/太湖.geojson').then(geojson => {
                 flatCoordinates(geojson);
                 geojson.features.forEach(feature => {
                     const { type, coordinates } = feature.geometry;
