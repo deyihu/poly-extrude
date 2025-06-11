@@ -42,10 +42,10 @@ export function extrudePolygonsOnPath(polygons: Array<PolygonType>, options?: Po
             const ring = polygon[i];
             validateRing(ring);
             if (i === 0) {
-                if (isClockwise(ring)) {
+                if (!isClockwise(ring)) {
                     polygon[i] = ring.reverse();
                 }
-            } else if (!isClockwise(ring)) {
+            } else if (isClockwise(ring)) {
                 polygon[i] = ring.reverse();
             }
         }
@@ -100,7 +100,7 @@ function transformPolygon(polygon: PolygonType, center: Point) {
                 // dz: 0,
                 distance,
                 radius: Math.sqrt(offsetx * offsetx + offsety * offsety),
-                angle: getAngle(center, p as Point)
+                angle: -getAngle(center, p as Point)
             }
             tempPoint = p;
         }
