@@ -43,7 +43,7 @@ export function expandPaths(lines: Array<PolylineType>, options?: PathsOptions):
         }
         return result;
     });
-    const result = merge(results) as PathsResult;
+    const result = merge<PathsResult>(results)
     result.lines = lines;
     return result;
 }

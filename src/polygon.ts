@@ -28,7 +28,7 @@ export function extrudePolygons(polygons: Array<PolygonType>, options?: Polygons
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
-    const result = merge(results as Array<ResultType>) as PolygonsResult;
+    const result = merge<PolygonsResult>(results as Array<ResultType>) ;
     result.polygons = polygons;
     return result;
 
@@ -205,7 +205,7 @@ export function polygons(polygons, options = {}): PolygonsResult {
         result.normal = new Float32Array(result.normal);
         return result;
     });
-    const result = merge(results as Array<ResultType>) as PolygonsResult;
+    const result = merge<PolygonsResult>(results as Array<ResultType>);
     result.polygons = polygons;
     return result;
 

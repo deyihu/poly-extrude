@@ -58,7 +58,7 @@ export function extrudePolygonsOnPath(polygons: Array<PolygonType>, options?: Po
         result.normal = new Float32Array(result.normal);
         return result;
     });
-    const result = merge(results as Array<ResultType>) as PolygonsOnPathResult;
+    const result = merge<PolygonsOnPathResult>(results as Array<ResultType>);
     result.polygons = polygons;
     return result;
 }

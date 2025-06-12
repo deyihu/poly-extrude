@@ -178,7 +178,7 @@ export function generateNormal(indices, position) {
     return normals;
 }
 
-export function merge(results: Array<ResultType>) {
+export function merge<T extends ResultType>(results: Array<ResultType>): T {
     if (results.length === 1) {
         const result = {
             position: results[0].position,
@@ -187,7 +187,7 @@ export function merge(results: Array<ResultType>) {
             indices: results[0].indices,
             results
         };
-        return result;
+        return result as T;
     }
     let plen = 0, ilen = 0;
     for (let i = 0, len = results.length; i < len; i++) {
@@ -220,7 +220,7 @@ export function merge(results: Array<ResultType>) {
         pOffset += position.length;
         pCount += position.length / 3;
     }
-    return result;
+    return result as T;
 }
 
 export function radToDeg(rad: number) {

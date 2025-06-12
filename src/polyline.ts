@@ -32,7 +32,7 @@ export function extrudePolylines(lines: Array<PolylineType>, options?: Polylines
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
-    const result = merge(results as Array<ResultType>) as PolylinesResult;
+    const result = merge<PolylinesResult>(results as Array<ResultType>);
     result.lines = lines;
     return result;
 }
@@ -73,7 +73,7 @@ export function extrudeSlopes(lines: Array<PolylineType>, options?: SlopesOption
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
-    const result = merge(results as Array<ResultType>) as PolylinesResult;
+    const result = merge<PolylinesResult>(results as Array<ResultType>);
     result.lines = lines;
     return result;
 }
