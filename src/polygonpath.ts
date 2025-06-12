@@ -2,7 +2,7 @@ import { Vector3 } from './math/Vector3';
 import { PathPoint } from './path/PathPoint';
 import { PathPointList } from './path/PathPointList';
 import { PolygonType, PolylineType, ResultType } from './type';
-import { generateNormal, isClockwise, line2Vectors, merge, validateRing, isClosedRing, calPolygonPointsCount, getPolygonsBBOX, mergeArray, validatePolygon } from './util';
+import { generateNormal, line2Vectors, merge, isClosedRing, calPolygonPointsCount, getPolygonsBBOX, mergeArray, validatePolygon } from './util';
 import earcut from 'earcut';
 const UP = new Vector3(0, 0, 1);
 const normalDir = new Vector3();
@@ -11,7 +11,13 @@ type PolygonsOnPathOptions = {
     extrudePath: PolylineType;
     openEnd?: boolean;
     openEndUV?: boolean;
+    polygonRotation?: number;
 
+}
+
+type PrivatePolygonsOnPathOptions = PolygonsOnPathOptions & {
+    center: Point;
+    bbox: [number, number, number, number]
 }
 
 type PolygonsOnPathResult = ResultType & {
@@ -22,7 +28,7 @@ type PolygonsOnPathResult = ResultType & {
 type Point = [number, number];
 
 export function extrudePolygonsOnPath(polygons: Array<PolygonType>, options?: PolygonsOnPathOptions) {
-    options = Object.assign({}, { openEnd: false, openEndUV: true }, options);
+    options = Object.assign({}, { openEnd: false, openEndUV: true, polygonRotation: 0 }, options);
     const { extrudePath, openEnd } = options;
     if (!extrudePath || !Array.isArray(extrudePath) || extrudePath.length < 2) {
         console.error('extrudePath is error:', extrudePath);
@@ -31,6 +37,8 @@ export function extrudePolygonsOnPath(polygons: Array<PolygonType>, options?: Po
     const bbox = getPolygonsBBOX(polygons);
     const [minx, miny, maxx, maxy] = bbox;
     const center = [(minx + maxx) / 2, (miny + maxy) / 2] as Point;
+    (options as any).center = center;
+    (options as any).bbox = bbox;
 
     const points = line2Vectors(extrudePath);
     const pathPointList = new PathPointList();
@@ -39,7 +47,7 @@ export function extrudePolygonsOnPath(polygons: Array<PolygonType>, options?: Po
 
     const results = polygons.map(polygon => {
         validatePolygon(polygon, false);
-        const result = generatePolygonOnPathVertexData(pathPointList, polygon, center) as Record<string, any>;
+        const result = generatePolygonOnPathVertexData(pathPointList, polygon, options as PrivatePolygonsOnPathOptions) as Record<string, any>;
         if (!openEnd) {
             generateStartAndEnd(result, polygon, options);
         }
@@ -65,7 +73,8 @@ function getAngle(c1: Point, c2: Point) {
 }
 
 
-function transformPolygon(polygon: PolygonType, center: Point) {
+function transformPolygon(polygon: PolygonType, options: PrivatePolygonsOnPathOptions) {
+    const { center, polygonRotation } = options;
     const [cx, cy] = center;
     const list = [];
     polygon.forEach((ring, rIndex) => {
@@ -89,7 +98,7 @@ function transformPolygon(polygon: PolygonType, center: Point) {
                 // dz: 0,
                 distance,
                 radius: Math.sqrt(offsetx * offsetx + offsety * offsety),
-                angle: -getAngle(center, p as Point)
+                angle: -getAngle(center, p as Point) + polygonRotation
             }
             tempPoint = p;
         }
@@ -104,8 +113,8 @@ function transformPolygon(polygon: PolygonType, center: Point) {
 const TEMP_VECTOR3 = new Vector3(0, 0, 0);
 // Vertex Data Generate Functions
 // code copy from https://github.com/shawn0326/three.path/blob/master/src/PathGeometry.js
-function generatePolygonOnPathVertexData(pathPointList, polygon: PolygonType, center: Point) {
-    const tpolygon = transformPolygon(polygon, center);
+function generatePolygonOnPathVertexData(pathPointList, polygon: PolygonType, options: PrivatePolygonsOnPathOptions) {
+    const tpolygon = transformPolygon(polygon, options);
     // let count = 0;
     // modify data
     const points: number[] = [];

@@ -223,11 +223,11 @@ export function merge(results: Array<ResultType>) {
     return result;
 }
 
-export function radToDeg(rad) {
+export function radToDeg(rad: number) {
     return rad * 180 / Math.PI;
 }
 
-export function degToRad(angle) {
+export function degToRad(angle: number) {
     return angle / 180 * Math.PI;
 }
 
@@ -281,7 +281,7 @@ export function generateSideWallUV(uvs, vertices, indexA, indexB, indexC, indexD
 
 }
 
-export function line2Vectors(line) {
+export function line2Vectors(line: PolylineType) {
     const points: Vector3[] = [];
     for (let i = 0, len = line.length; i < len; i++) {
         const p = line[i];
