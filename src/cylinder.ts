@@ -11,8 +11,8 @@ type CylinderResult = ResultType & {
     points: Float32Array
 }
 
-export function cylinder(point: [number, number], options?: CylinderOptions): CylinderResult {
-    options = Object.assign({}, { radius: 1, height: 2, radialSegments: 6 }, options);
+export function cylinder(point: [number, number], opts?: CylinderOptions): CylinderResult {
+    const options = Object.assign({}, { radius: 1, height: 2, radialSegments: 6 }, opts);
     const radialSegments = Math.round(Math.max(4, options.radialSegments as number));
     let { radius, height } = options;
     radius = (radius as number);

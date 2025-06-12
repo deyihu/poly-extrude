@@ -17,8 +17,8 @@ type TubesResult = ResultType & {
     lines: Array<PolylineType>;
 }
 
-export function expandTubes(lines: Array<PolylineType>, options?: TubesOptions) {
-    options = Object.assign({}, { radius: 1, cornerSplit: 0, radialSegments: 8, startRad: -Math.PI / 4 }, options);
+export function expandTubes(lines: Array<PolylineType>, opts?: TubesOptions) {
+    const options = Object.assign({}, { radius: 1, cornerSplit: 0, radialSegments: 8, startRad: -Math.PI / 4 }, opts);
     const results = lines.map(line => {
         const points = line2Vectors(line);
         const pathPointList = new PathPointList();

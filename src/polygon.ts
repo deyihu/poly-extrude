@@ -13,8 +13,8 @@ type PolygonsResult = ResultType & {
 }
 
 
-export function extrudePolygons(polygons: Array<PolygonType>, options?: PolygonsOptions): PolygonsResult {
-    options = Object.assign({}, { depth: 2, top: true }, options);
+export function extrudePolygons(polygons: Array<PolygonType>, opts?: PolygonsOptions): PolygonsResult {
+    const options = Object.assign({}, { depth: 2, top: true }, opts);
     const results = polygons.map(polygon => {
         validatePolygon(polygon, true);
         const result = flatVertices(polygon, options) as Record<string, any>;
@@ -28,7 +28,7 @@ export function extrudePolygons(polygons: Array<PolygonType>, options?: Polygons
         result.normal = generateNormal(result.indices, result.position);
         return result;
     });
-    const result = merge<PolygonsResult>(results as Array<ResultType>) ;
+    const result = merge<PolygonsResult>(results as Array<ResultType>);
     result.polygons = polygons;
     return result;
 
@@ -193,7 +193,8 @@ function simplePolygon(polygon, options = {}) {
     }
 }
 
-export function polygons(polygons, options = {}): PolygonsResult {
+export function polygons(polygons, opts = {}): PolygonsResult {
+    const options = Object.assign({}, opts);
     const results = polygons.map(polygon => {
         validatePolygon(polygon, true);
 

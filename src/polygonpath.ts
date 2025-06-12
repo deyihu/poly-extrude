@@ -1,5 +1,5 @@
 import { Vector3 } from './math/Vector3';
-import { PathPoint } from './path/PathPoint';
+// import { PathPoint } from './path/PathPoint';
 import { PathPointList } from './path/PathPointList';
 import { PolygonType, PolylineType, ResultType } from './type';
 import { generateNormal, line2Vectors, merge, isClosedRing, calPolygonPointsCount, getPolygonsBBOX, mergeArray, validatePolygon } from './util';
@@ -24,11 +24,10 @@ type PolygonsOnPathResult = ResultType & {
     polygons: Array<PolygonType>;
 }
 
-
 type Point = [number, number];
 
-export function extrudePolygonsOnPath(polygons: Array<PolygonType>, options?: PolygonsOnPathOptions) {
-    options = Object.assign({}, { openEnd: false, openEndUV: true, polygonRotation: 0 }, options);
+export function extrudePolygonsOnPath(polygons: Array<PolygonType>, opts?: PolygonsOnPathOptions) {
+    const options = (Object.assign({}, { openEnd: false, openEndUV: true, polygonRotation: 0 }, opts)) as PrivatePolygonsOnPathOptions;
     const { extrudePath, openEnd } = options;
     if (!extrudePath || !Array.isArray(extrudePath) || extrudePath.length < 2) {
         console.error('extrudePath is error:', extrudePath);
@@ -37,8 +36,8 @@ export function extrudePolygonsOnPath(polygons: Array<PolygonType>, options?: Po
     const bbox = getPolygonsBBOX(polygons);
     const [minx, miny, maxx, maxy] = bbox;
     const center = [(minx + maxx) / 2, (miny + maxy) / 2] as Point;
-    (options as any).center = center;
-    (options as any).bbox = bbox;
+    options.center = center;
+    options.bbox = bbox;
 
     const points = line2Vectors(extrudePath);
     const pathPointList = new PathPointList();

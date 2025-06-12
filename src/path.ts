@@ -24,8 +24,8 @@ type PathsResult = ResultType & {
     lines: Array<PolylineType>;
 }
 
-export function expandPaths(lines: Array<PolylineType>, options?: PathsOptions): PathsResult {
-    options = Object.assign({}, { lineWidth: 1, cornerRadius: 0, cornerSplit: 10 }, options);
+export function expandPaths(lines: Array<PolylineType>, opts?: PathsOptions): PathsResult {
+    const options = Object.assign({}, { lineWidth: 1, cornerRadius: 0, cornerSplit: 10 }, opts);
     const results = lines.map(line => {
         const points = line2Vectors(line);
         const pathPointList = new PathPointList();
