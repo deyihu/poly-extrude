@@ -171,6 +171,7 @@ ___
 [polygonRotation](https://deyihu.github.io/poly-extrude/test/polygon-on-path-rotation.html)  
 [extrude along spring](https://deyihu.github.io/poly-extrude/test/polygon-on-path-spring.html)  
 [extrude taihu lake](https://deyihu.github.io/poly-extrude/test/polygon-on-path-taihu.html)  
+[extrude by curve](https://deyihu.github.io/poly-extrude/test/polygon-on-path-curve.html)  
 
 
 ___
