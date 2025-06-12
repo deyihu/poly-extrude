@@ -147,6 +147,7 @@ ___
 * `options.extrudePath` is line
 * `options.openEnd`
 * `options.openEndUV`
+* `options.polygonRotation`
 
 ```js
   const result = extrudePolygonsOnPath(polygons, {
@@ -165,8 +166,9 @@ ___
 ```
 
 [base demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path.html)  
-[with holes demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole.html)  
+[with holes](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole.html)  
 [with holes by custom shape](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole1.html)  
+[polygonRotation](https://deyihu.github.io/poly-extrude/test/polygon-on-path-rotation.html)  
 [extrude along spring](https://deyihu.github.io/poly-extrude/test/polygon-on-path-spring.html)  
 [extrude taihu lake](https://deyihu.github.io/poly-extrude/test/polygon-on-path-taihu.html)  
 
