@@ -36,14 +36,49 @@
             return texture;
         }
 
-        const polygon = [
-            [
-                [6, 0],
-                [0, -6,],
-                [-6, 0],
-                [0, 6],
+        const smileyShape = new THREE.Shape()
+            .moveTo(80, 40)
+            .absarc(40, 40, 40, 0, Math.PI * 2, false);
+
+        const smileyEye1Path = new THREE.Path()
+            .moveTo(35, 20)
+            .absellipse(25, 20, 10, 10, 0, Math.PI * 2, true);
+
+        const smileyEye2Path = new THREE.Path()
+            .moveTo(65, 20)
+            .absarc(55, 20, 10, 0, Math.PI * 2, true);
+
+        const smileyMouthPath = new THREE.Path()
+            .moveTo(20, 40)
+            .quadraticCurveTo(40, 60, 60, 40)
+            .bezierCurveTo(70, 45, 70, 50, 60, 60)
+            .quadraticCurveTo(40, 80, 20, 60)
+            .quadraticCurveTo(5, 50, 20, 40);
+
+        smileyShape.holes.push(smileyEye1Path);
+        smileyShape.holes.push(smileyEye2Path);
+        smileyShape.holes.push(smileyMouthPath);
+
+        // console.log(smileyShape.extractPoints(3));
+
+        function createRing(ring) {
+            return ring.map(v => {
+                return [v.x, v.y]
+            })
+        }
+
+        function createPolygon(result) {
+            const { shape, holes } = result;
+            return [
+                createRing(shape),
+                ...holes.map(ring => {
+                    return createRing(ring)
+                })
             ]
-        ]
+        }
+
+
+
 
         function scaleShape(polygon) {
             for (let i = 0, len = polygon.length; i < len; i++) {
@@ -57,12 +92,15 @@
             }
         }
 
+        const shape = createPolygon(smileyShape.extractPoints(3))
+        scaleShape(shape);
+
         let extrudePath;
         let geometry;
         let polygonRotationAngle = 0;
         function createGeometry() {
 
-            const result = polyextrude.extrudePolygonsOnPath([polygon], { extrudePath, openEnd: false, openEndUV: false, polygonRotation: polygonRotationAngle / 180 * Math.PI });
+            const result = polyextrude.extrudePolygonsOnPath([shape], { extrudePath, openEnd: false, openEndUV: false, polygonRotation: polygonRotationAngle / 180 * Math.PI });
             // console.log(result);
             if (!geometry) {
                 geometry = createBufferGeometry(result);
@@ -85,8 +123,6 @@
         }
 
         function test() {
-
-
 
             getGeoJSON('./data/simple-line.geojson').then(geojson1 => {
                 flatCoordinates(geojson1);
