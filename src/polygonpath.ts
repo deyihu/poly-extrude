@@ -191,10 +191,11 @@ function generatePolygonOnPathVertexData(pathPointList, polygon: PolygonType, op
             const begin1 = verticesCount - (radialSegments) * 2;
             const begin2 = verticesCount - (radialSegments);
 
-            for (let i = 0; i < radialSegments; i++) {
+            for (let i = 0; i < radialSegments - 1; i++) {
                 indices[++iIndex] = begin2 + i;
                 indices[++iIndex] = begin1 + i;
                 indices[++iIndex] = begin1 + i + 1;
+
                 indices[++iIndex] = begin2 + i;
                 indices[++iIndex] = begin1 + i + 1;
                 indices[++iIndex] = begin2 + i + 1;
