@@ -166,6 +166,7 @@ ___
 ```
 
 [base demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path.html)  
+[wireframe demo](https://deyihu.github.io/poly-extrude/test/polygon-on-path-wireframe.html)  
 [with holes](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole.html)  
 [with holes by custom shape](https://deyihu.github.io/poly-extrude/test/polygon-on-path-hole1.html)  
 [polygonRotation](https://deyihu.github.io/poly-extrude/test/polygon-on-path-rotation.html)  
