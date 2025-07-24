@@ -308,42 +308,99 @@ function generateSides(result, options) {
 const TEMPV1 = { x: 0, y: 0 }, TEMPV2 = { x: 0, y: 0 };
 
 export function expandLine(line, options) {
-    // let preAngle = 0;
     let radius = options.lineWidth / 2;
     if (options.isSlope) {
         radius *= 2;
     }
     const points: Array<number[]> = [], leftPoints: Array<number[]> = [], rightPoints: Array<number[]> = [];
     const len = line.length;
+
+    const repeatVertex = () => {
+        const len1 = leftPoints.length;
+        if (len1) {
+            leftPoints.push(leftPoints[len1 - 1]);
+            rightPoints.push(rightPoints[len1 - 1]);
+            const len2 = points.length;
+            points.push(points[len2 - 2], points[len2 - 1]);
+        }
+    };
+
+    const equal = (p1, p2) => {
+        return p1[0] === p2[0] && p1[1] === p2[1];
+    };
+
     let i = 0;
     while (i < len) {
         let p1 = line[i],
             p2 = line[i + 1];
-        const currentp = line[i];
+        const currentp = p1;
         // last vertex
         if (i === len - 1) {
             p1 = line[len - 2];
             p2 = line[len - 1];
+            if (equal(p1, p2)) {
+                for (let j = line.indexOf(p1); j >= 0; j--) {
+                    const p = line[j];
+                    if (!equal(p, currentp)) {
+                        p1 = p;
+                        break;
+                    }
+                }
+            }
+        } else {
+            if (equal(p1, p2)) {
+                for (let j = line.indexOf(p2); j < len; j++) {
+                    const p = line[j];
+                    if (!equal(p, currentp)) {
+                        p2 = p;
+                        break;
+                    }
+                }
+            }
         }
-        const dy = p2[1] - p1[1],
+        if (equal(p1, p2)) {
+            repeatVertex();
+            i++;
+            continue;
+        }
+
+        let dy = p2[1] - p1[1],
             dx = p2[0] - p1[0];
+
         let rAngle = 0;
-        const rad = Math.atan(dy / dx);
+        const rad = Math.atan2(dy, dx);
         const angle = radToDeg(rad);
-        // preAngle = angle;
         if (i === 0 || i === len - 1) {
             rAngle = angle;
             rAngle -= 90;
         } else {
             // 至少3个顶点才会触发
-            const p0 = line[i - 1];
+            let p0 = line[i - 1];
+            if (equal(p0, p2) || equal(p0, p1)) {
+                for (let j = line.indexOf(p2); j >= 0; j--) {
+                    const p = line[j];
+                    if (!equal(p, p2) && (!equal(p, p1))) {
+                        p0 = p;
+                        break;
+                    }
+                }
+            }
+            if (equal(p0, p2) || equal(p0, p1) || equal(p1, p2)) {
+                repeatVertex();
+                i++;
+                continue;
+            }
             TEMPV1.x = p0[0] - p1[0];
             TEMPV1.y = p0[1] - p1[1];
             TEMPV2.x = p2[0] - p1[0];
             TEMPV2.y = p2[1] - p1[1];
+            if ((TEMPV1.x === 0 && TEMPV1.y === 0) || (TEMPV2.x === 0 && TEMPV2.y === 0)) {
+                console.error('has repeat vertex,the index:', i);
+            }
             const vAngle = getAngle(TEMPV1, TEMPV2);
             rAngle = angle - vAngle / 2;
         }
+
         const rRad = degToRad(rAngle);
         const p3 = currentp;
         const x = Math.cos(rRad) + p3[0], y = Math.sin(rRad) + p3[1];
@@ -357,6 +414,7 @@ export function expandLine(line, options) {
             const point1 = points[len1 - 2];
             const point2 = points[len1 - 1];
             if (!point1 || !point2) {
+                i++;
                 continue;
             }
             op1 = [point1[0], point1[1]];
@@ -412,8 +470,11 @@ export function leftOnLine(p, p1, p2) {
  * @param {*} distance
  * @returns
  */
-function translateLine(p1, p2, distance) {
+export function translateLine(p1, p2, distance) {
     const dy = p2[1] - p1[1], dx = p2[0] - p1[0];
+    if (dy === 0 && dx === 0) {
+        return null;
+    }
     const rad = Math.atan2(dy, dx);
     const rad1 = rad + Math.PI / 2;
     let offsetX = Math.cos(rad1) * distance, offsetY = Math.sin(rad1) * distance;
@@ -438,13 +499,14 @@ function translateLine(p1, p2, distance) {
 function lineIntersection(p1, p2, p3, p4): Array<number> | null {
     const dx1 = p2[0] - p1[0], dy1 = p2[1] - p1[1];
     const dx2 = p4[0] - p3[0], dy2 = p4[1] - p3[1];
+    //vertical 
     if (dx1 === 0 && dx2 === 0) {
         return null;
     }
+    //horizontal
     if (dy1 === 0 && dy2 === 0) {
         return null;
     }
-
     const k1 = dy1 / dx1;
     const k2 = dy2 / dx2;
 
