@@ -204,6 +204,7 @@ ___
 [line](https://deyihu.github.io/poly-extrude/test/line.html)  
 [line uv](https://deyihu.github.io/poly-extrude/test/line-uv.html)  
 [line pathUV](https://deyihu.github.io/poly-extrude/test/line-pathuv.html)  
+[line cutcorner](https://deyihu.github.io/poly-extrude/test/line-cutCorner.html)  
 [brige](https://deyihu.github.io/poly-extrude/test/brige.html)  
 [brige bottomStickGround](https://deyihu.github.io/poly-extrude/test/brige-bottomStickGround.html)  
 [extrude brige](https://deyihu.github.io/poly-extrude/test/extrudepolyline-brige.html)  
