@@ -408,15 +408,25 @@ export function expandLine(line, options?: ExpandLineOptions) {
                 i++;
                 continue;
             }
-            TEMPV1.x = p0[0] - p1[0];
-            TEMPV1.y = p0[1] - p1[1];
-            TEMPV2.x = p2[0] - p1[0];
-            TEMPV2.y = p2[1] - p1[1];
-            if ((TEMPV1.x === 0 && TEMPV1.y === 0) || (TEMPV2.x === 0 && TEMPV2.y === 0)) {
-                console.error('has repeat vertex,the index:', i);
+            const dy1 = p1[1] - p0[1], dx1 = p1[0] - p0[0];
+            const rad1 = Math.atan2(dy1, dx1);
+            const angle1 = radToDeg(rad1);
+            // 平行，回头路
+            if ((Math.abs(angle1 - angle) - 180) <= 0.0001) {
+                rAngle = angle;
+                rAngle -= 90;
+            } else {
+                TEMPV1.x = p0[0] - p1[0];
+                TEMPV1.y = p0[1] - p1[1];
+                TEMPV2.x = p2[0] - p1[0];
+                TEMPV2.y = p2[1] - p1[1];
+                if ((TEMPV1.x === 0 && TEMPV1.y === 0) || (TEMPV2.x === 0 && TEMPV2.y === 0)) {
+                    console.error('has repeat vertex,the index:', i);
+                }
+                const vAngle = getAngle(TEMPV1, TEMPV2);
+                rAngle = angle - vAngle / 2;
+
             }
-            const vAngle = getAngle(TEMPV1, TEMPV2);
-            rAngle = angle - vAngle / 2;
         }
 
         const rRad = degToRad(rAngle);
