@@ -1,6 +1,6 @@
 {
   "name": "poly-extrude",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "description": "extrude polyline/polygon etc",
   "main": "dist/poly-extrude.js",
   "module": "dist/poly-extrude.mjs",
