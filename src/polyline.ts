@@ -415,7 +415,6 @@ export function expandLine(line, options?: ExpandLineOptions) {
             if (Math.abs(Math.abs(angle1 - angle) - 180) <= 0.0001) {
                 rAngle = angle;
                 rAngle -= 90;
-                console.log()
             } else {
                 TEMPV1.x = p0[0] - p1[0];
                 TEMPV1.y = p0[1] - p1[1];
