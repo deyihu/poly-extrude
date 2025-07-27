@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name=renderer content=webkit>
+<script type="text/javascript" src="https://unpkg.com/@maptalks/geojson-bbox@1.0.4/dist/bbox.umd.js"></script>
+<script type="text/javascript" src="https://unpkg.com/three@0.138.0/build/three.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/three@0.142.0/examples/js/controls/OrbitControls.js"></script>
+<script type="text/javascript" src="../dist/poly-extrude.js"></script>
+<script type="text/javascript" src="./util.js"></script>
+<!-- <script type="text/javascript" src="http://localhost/geometry-extrude/dist/geometry-extrude.js"></script> -->
+
+<style type="text/css">
+    html,
+    body {
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .container {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <script>
+        const scene = createScene();
+
+
+        function getTexture() {
+            const texture = new THREE.TextureLoader().load('./data/a.png');
+            texture.needsUpdate = true; //使用贴图时进行更新
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(1, 1);
+            return texture;
+        }
+
+        const material = new THREE.MeshLambertMaterial({
+            color: '#FFF',
+            wireframe: false,
+            vertexColors: false,
+            // map: getTexture()
+        })
+
+        const lineMaterial = new THREE.LineBasicMaterial({ color: '#000' });
+
+        function createLine(coordinates) {
+            const array = [];
+            coordinates.forEach(c => {
+                array.push(...c, 0);
+            });
+            const position = new Float32Array(array);
+            const geometry = new THREE.BufferGeometry();
+            // eslint-disable-next-line no-undef
+            geometry.setAttribute('position', new THREE.BufferAttribute(position, 3));
+            const line = new THREE.Line(geometry, lineMaterial);
+            return line;
+        }
+
+
+
+
+
+        function test() {
+
+            const path = [
+                [0, 0],
+                [10, 10],
+                [20, 20],
+                [100, 100]
+            ]
+            const time = 'time';
+            console.time(time);
+            const result = polyextrude.extrudePolylines([path],
+                { depth: 1, lineWidth: 4, cutCorner: true, pathUV: false }
+            );
+            console.timeEnd(time);
+            console.log(result);
+            const geometry = createBufferGeometry(result);
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+        }
+
+        function test1() {
+
+            const path = [
+                [0, 0],
+                [10, 10],
+                [20, 20],
+                [-100, -100]
+            ]
+            const time = 'time';
+            console.time(time);
+            const result = polyextrude.extrudePolylines([path],
+                { depth: 1, lineWidth: 4, cutCorner: true, pathUV: false }
+            );
+            console.timeEnd(time);
+            console.log(result);
+            const geometry = createBufferGeometry(result);
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+        }
+
+        test1();
+
+
+
+    </script>
+</body>
+
+</html>
