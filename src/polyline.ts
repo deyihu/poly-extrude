@@ -412,9 +412,10 @@ export function expandLine(line, options?: ExpandLineOptions) {
             const rad1 = Math.atan2(dy1, dx1);
             const angle1 = radToDeg(rad1);
             // 平行，回头路
-            if ((Math.abs(angle1 - angle) - 180) <= 0.0001) {
+            if (Math.abs(Math.abs(angle1 - angle) - 180) <= 0.0001) {
                 rAngle = angle;
                 rAngle -= 90;
+                console.log()
             } else {
                 TEMPV1.x = p0[0] - p1[0];
                 TEMPV1.y = p0[1] - p1[1];
