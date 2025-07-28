@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name=renderer content=webkit>
+<!-- <script type="text/javascript" src="https://unpkg.com/@maptalks/geojson-bbox@1.0.4/dist/bbox.umd.js"></script>
+<script type="text/javascript" src="https://unpkg.com/three@0.138.0/build/three.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/three@0.142.0/examples/js/controls/OrbitControls.js"></script> -->
+<script type="text/javascript" src="../dist/poly-extrude.js"></script>
+<script type="text/javascript" src="./util.js"></script>
+<!-- <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/maptalks/dist/maptalks.min.css' /> -->
+<script type='text/javascript' src='https://cdn.jsdelivr.net/npm/maptalks-gl/dist/maptalks-gl.js'></script>
+<!-- <script type="text/javascript" src="http://localhost/geometry-extrude/dist/geometry-extrude.js"></script> -->
+
+<style type="text/css">
+    html,
+    body {
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .container {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <div class="container" id="map"></div>
+    <script>
+        // const scene = createScene();
+
+        // function formatAltitude(lines) {
+        //     lines.forEach(line => {
+        //         line.forEach(c => {
+        //             c[2] /= 1000;
+        //         });
+        //     });
+        // }
+
+        maptalks.GlobalConfig.crsMaxNativeZoom = 26;
+        let list = [
+            { "cood": [114.024007, 22.63972], "speed": 1, "index": 0 },
+            { "cood": [114.023999, 22.639864], "speed": 1, "index": 1 },
+            { "cood": [114.023991, 22.639867], "speed": 1, "index": 2 },
+            { "cood": [114.023991, 22.639867], "speed": 1, "index": 3 },
+            { "cood": [114.023991, 22.639867], "speed": 1, "index": 4 },
+            { "cood": [114.021353, 22.641103], "speed": 24, "index": 5 },
+            { "cood": [114.021361, 22.641092], "speed": 25, "index": 6 },
+            { "cood": [114.022278, 22.640967], "speed": 26, "index": 7 },
+            { "cood": [114.023632, 22.640069], "speed": 1, "index": 8 },
+            { "cood": [114.023632, 22.640069], "speed": 1, "index": 9 },
+            { "cood": [114.023632, 22.640069], "speed": 1, "index": 10 },
+            { "cood": [114.024075, 22.640396], "speed": 1, "index": 11 },
+            { "cood": [114.024022, 22.640298], "speed": 1, "index": 12 },
+            { "cood": [114.023991, 22.640232], "speed": 1, "index": 13 },
+            { "cood": [114.023999, 22.64018], "speed": 29, "index": 14 },
+            { "cood": [114.02393, 22.64002], "speed": 30, "index": 15 },
+            { "cood": [114.023907, 22.639974], "speed": 40, "index": 16 },
+            { "cood": [114.023938, 22.63989], "speed": 35, "index": 17 },
+            { "cood": [114.023938, 22.63989], "speed": 0, "index": 18 },
+            { "cood": [114.023938, 22.63989], "speed": 0, "index": 19 },
+            { "cood": [114.023249, 22.639928], "speed": 0, "index": 20 },
+            { "cood": [114.023432, 22.639406], "speed": 0, "index": 21 },
+            { "cood": [114.023394, 22.639392], "speed": 0, "index": 22 },
+            { "cood": [114.023555, 22.639466], "speed": 0, "index": 23 },
+            { "cood": [114.023639, 22.639552], "speed": 0, "index": 24 },
+            { "cood": [114.023708, 22.63959], "speed": 0, "index": 25 },
+            { "cood": [114.023754, 22.639662], "speed": 0, "index": 26 },
+            { "cood": [114.023807, 22.639788], "speed": 0, "index": 27 },
+            { "cood": [114.023784, 22.639887], "speed": 0, "index": 28 },
+            { "cood": [114.023777, 22.639922], "speed": 0, "index": 29 },
+            { "cood": [114.023769, 22.639971], "speed": 0, "index": 30 },
+            { "cood": [114.023746, 22.64007], "speed": 0, "index": 31 },
+            { "cood": [114.023731, 22.64007], "speed": 0, "index": 32 },
+            { "cood": [114.023739, 22.640063], "speed": 0, "index": 33 },
+            { "cood": [114.023708, 22.640061], "speed": 0, "index": 34 },
+            { "cood": [114.023731, 22.640053], "speed": 0, "index": 35 },
+            { "cood": [114.023739, 22.640032], "speed": 0, "index": 36 },
+            { "cood": [114.023754, 22.640006], "speed": 0, "index": 37 },
+            { "cood": [114.023777, 22.639981], "speed": 0, "index": 38 },
+            { "cood": [114.023769, 22.639969], "speed": 0, "index": 39 },
+            { "cood": [114.023822, 22.639971], "speed": 0, "index": 40 },
+            { "cood": [114.023807, 22.639979], "speed": 0, "index": 41 },
+            { "cood": [114.023883, 22.639968], "speed": 0, "index": 42 },
+            { "cood": [114.023976, 22.639926], "speed": 0, "index": 43 },
+            { "cood": [114.023946, 22.63993], "speed": 0, "index": 44 },
+            { "cood": [114.023938, 22.639942], "speed": 0, "index": 45 },
+            { "cood": [114.023892, 22.639944], "speed": 0, "index": 46 },
+            { "cood": [114.023892, 22.639944], "speed": 0, "index": 47 },
+            { "cood": [114.023892, 22.639944], "speed": 0, "index": 48 },
+            { "cood": [114.024068, 22.640041], "speed": 0, "index": 49 },
+            { "cood": [114.023822, 22.639937], "speed": 0, "index": 50 },
+            { "cood": [114.023662, 22.639905], "speed": 0, "index": 51 },
+            { "cood": [114.023616, 22.639887], "speed": 0, "index": 52 },
+            { "cood": [114.023632, 22.639863], "speed": 0, "index": 53 },
+            { "cood": [114.023632, 22.639863], "speed": 0, "index": 54 },
+            { "cood": [114.023632, 22.639863], "speed": 0, "index": 55 },
+            { "cood": [114.023868, 22.639921], "speed": 0, "index": 56 },
+            { "cood": [114.023632, 22.639863], "speed": 0, "index": 57 },
+            { "cood": [114.023632, 22.639863], "speed": 0, "index": 58 },
+            { "cood": [114.024045, 22.639867], "speed": 0, "index": 59 },
+            { "cood": [114.023968, 22.639875], "speed": 0, "index": 60 },
+            { "cood": [114.023968, 22.639896], "speed": 0, "index": 61 },
+            { "cood": [114.023968, 22.639896], "speed": 0, "index": 62 },
+            { "cood": [114.023968, 22.639896], "speed": 0, "index": 63 },
+            { "cood": [114.023876, 22.640239], "speed": 0, "index": 64 },
+            { "cood": [114.023968, 22.639896], "speed": 0, "index": 65 },
+            { "cood": [114.023968, 22.639896], "speed": 0, "index": 66 },
+            { "cood": [114.024037, 22.639522], "speed": 0, "index": 67 },
+            { "cood": [114.024052, 22.639823], "speed": 0, "index": 68 },
+            { "cood": [114.024037, 22.639909], "speed": 0, "index": 69 },
+            { "cood": [114.023991, 22.63993], "speed": 0, "index": 70 },
+            { "cood": [114.023953, 22.639944], "speed": 0, "index": 71 },
+            { "cood": [114.023953, 22.639944], "speed": 0, "index": 72 },
+            { "cood": [114.023953, 22.639944], "index": 73 }
+        ];
+
+        list.forEach((d, index) => {
+            d.index = index;
+        });
+        // console.log(JSON.stringify(list, null, 4))
+
+        function filterCoordinates(coordinates) {
+            const result = [];
+            for (let i = 0, len = coordinates.length; i < len; i++) {
+                const c = coordinates[i];
+                if (result.length) {
+                    const last = result[result.length - 1];
+                    if (c[0] === last[0] && c[1] === last[1]) {
+                        continue; // Skip duplicate coordinates
+                    }
+                }
+                result.push(c);
+            }
+            return result
+        }
+
+
+        const map = new maptalks.Map("map", {
+            center: [114.024072, 22.640064],
+            zoom: 12,
+        });
+        const layer1 = new maptalks.VectorLayer('layer1').addTo(map);
+        const layer = new maptalks.VectorLayer('vector').addTo(map);
+
+
+        const updateLine = (tempCoordinates) => {
+            layer1.clear();
+            const res = map.getResolution();
+            const width = map.getResolution() / 100000000;
+            console.log(width);
+            const result = polyextrude.expandLine(tempCoordinates, { lineWidth: width });
+            console.log(result);
+            const { leftPoints, rightPoints } = result;
+            for (let i = 0, len = leftPoints.length; i < len; i++) {
+                const left1 = leftPoints[i];
+                const right1 = rightPoints[i];
+                const left2 = leftPoints[i + 1];
+                const right2 = rightPoints[i + 1];
+                if (!left2 || !right2) continue;
+                const coords = [
+                    left1,
+                    left2,
+                    right2,
+                    right1,
+                ];
+                const polygon = new maptalks.Polygon(coords, {
+                    symbol: {
+                        lineWidth: 0,
+                        polygonFill: i % 2 === 0 ? '#f00' : '#0f0',
+                        polygonOpacity: 1
+                    },
+                    zIndex: 10 + i
+                }).addTo(layer1);
+            }
+        }
+
+
+        function test() {
+            // map.setCenter([114.02370862, 22.63995672]);
+            // map.setZoom(19);
+            let tempCoordinates = list.slice(0, 74).map(d => {
+                return [...d.cood];
+            })
+            //  tempCoordinates=filterCoordinates(tempCoordinates);
+            let line = new maptalks.LineString(tempCoordinates, {
+                symbol: {
+                    lineWidth: 2,
+                    // linePatternFile: pathURL,
+                    // linePatternGap: 20,
+                    lineCap: "round",
+                },
+                zIndex: 13,
+            }).addTo(layer);
+            const texts = line.getCoordinates().map((c, i) => {
+                return new maptalks.Marker(c, {
+                    symbol: {
+                        textName: i,
+                        textSize: 12,
+                        textFill: '#000',
+                        textHaloFill: '#fff',
+                        textHaloRadius: 2,
+                        textDy: -10,
+                        zIndex: 20 + i
+                    }
+                });
+            });
+            layer.addGeometry(texts);
+            updateLine(tempCoordinates);
+            map.setView({
+                center: tempCoordinates[tempCoordinates.length - 1],
+                zoom: 26
+            })
+            // map.setZoom(25);
+            map.setCenter(tempCoordinates[tempCoordinates.length - 1]);
+
+        }
+
+
+        function test1() {
+            map.setCenter([114.02370862, 22.63995672]);
+            map.setZoom(19);
+            const tempCoordinates = list.slice(0, 6).map(d => {
+                return [...d.cood];
+            })
+            for (let i = 0, len = tempCoordinates.length; i < len; i++) {
+                const c1 = tempCoordinates[i];
+                const c2 = tempCoordinates[i + 1];
+                if (!c2) continue;
+                const result = polyextrude.translateLine(c1, c2, 0.00001);
+                if (!result) {
+                    continue;
+                }
+                const [coord1, coord2] = result;
+                const line = new maptalks.LineString(coord1, {
+                    symbol: {
+                        lineWidth: 2,
+                        lineColor: '#f00',
+                        lineCap: "round",
+                    },
+                    zIndex: 13 + i
+                }).addTo(layer);
+                const line1 = new maptalks.LineString(coord2, {
+                    symbol: {
+                        lineWidth: 2,
+                        lineColor: '#f00',
+                        lineCap: "round",
+                    },
+                    zIndex: 13 + i
+                }).addTo(layer);
+                const line2 = new maptalks.LineString([c1, c2], {
+                    symbol: {
+                        lineWidth: 2,
+                        lineColor: '#000',
+                        lineCap: "round",
+                    },
+                    zIndex: 13 + i
+                }).addTo(layer);
+
+            }
+        }
+
+        test();
+
+
+
+    </script>
+</body>
+
+</html>
