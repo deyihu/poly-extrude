@@ -28,6 +28,8 @@ type PolylinesResult = ResultType & {
     lines: Array<PolylineType>;
 }
 
+type Point = Array<number>;
+
 export function extrudePolylines(lines: Array<PolylineType>, opts?: PolylinesOptions): PolylinesResult {
     const options = Object.assign({}, { depth: 2, lineWidth: 1, bottomStickGround: false, pathUV: false }, opts);
     checkOptions(options);
@@ -321,7 +323,7 @@ function generateSides(result, options) {
 
 const TEMPV1 = { x: 0, y: 0 }, TEMPV2 = { x: 0, y: 0 };
 
-export function expandLine(line, options?: ExpandLineOptions) {
+export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptions) {
     options = Object.assign({}, { lineWidth: 1, cutCorner: false }, options);
     let radius = options.lineWidth / 2;
     if ((options as any).isSlope) {
@@ -348,10 +350,10 @@ export function expandLine(line, options?: ExpandLineOptions) {
     let i = 0;
     let preleftline, prerightline;
     while (i < len) {
-        let p0;
+        let p0: Point;
         let p1 = line[i],
             p2 = line[i + 1];
-        const currentp = p1;
+        const current = p1;
         // last vertex
         if (i === len - 1) {
             p1 = line[len - 2];
@@ -359,7 +361,7 @@ export function expandLine(line, options?: ExpandLineOptions) {
             if (equal(p1, p2)) {
                 for (let j = line.indexOf(p1); j >= 0; j--) {
                     const p = line[j];
-                    if (!equal(p, currentp)) {
+                    if (!equal(p, current)) {
                         p1 = p;
                         break;
                     }
@@ -369,7 +371,7 @@ export function expandLine(line, options?: ExpandLineOptions) {
             if (equal(p1, p2)) {
                 for (let j = line.indexOf(p2); j < len; j++) {
                     const p = line[j];
-                    if (!equal(p, currentp)) {
+                    if (!equal(p, current)) {
                         p2 = p;
                         break;
                     }
@@ -389,8 +391,7 @@ export function expandLine(line, options?: ExpandLineOptions) {
         const rad = Math.atan2(dy, dx);
         const angle = radToDeg(rad);
         if (i === 0 || i === len - 1) {
-            rAngle = angle;
-            rAngle -= 90;
+            rAngle = angle - 90;
         } else {
             // 至少3个顶点才会触发
             p0 = line[i - 1];
@@ -413,8 +414,7 @@ export function expandLine(line, options?: ExpandLineOptions) {
             const angle1 = radToDeg(rad1);
             // 平行，回头路
             if (Math.abs(Math.abs(angle1 - angle) - 180) <= 0.0001) {
-                rAngle = angle;
-                rAngle -= 90;
+                rAngle = angle - 90;
             } else {
                 TEMPV1.x = p0[0] - p1[0];
                 TEMPV1.y = p0[1] - p1[1];
@@ -430,14 +430,20 @@ export function expandLine(line, options?: ExpandLineOptions) {
         }
 
         const rRad = degToRad(rAngle);
-        const p3 = currentp;
+        const p3 = current;
         const x = Math.cos(rRad) + p3[0], y = Math.sin(rRad) + p3[1];
         const p4 = [x, y];
         const [leftline, rightline] = translateLine(p1, p2, radius);
+        if (!leftline || !rightline) {
+            console.error('translateLine line eror,the index:', i, line);
+            i++;
+            continue;
+        }
         let op1 = lineIntersection(leftline[0], leftline[1], p3, p4);
         let op2 = lineIntersection(rightline[0], rightline[1], p3, p4);
         // 平行，回头路
         if (!op1 || !op2) {
+            console.error('not find Intersection,the index:', i, line);
             const len1 = points.length;
             const point1 = points[len1 - 2];
             const point2 = points[len1 - 1];
@@ -448,14 +454,14 @@ export function expandLine(line, options?: ExpandLineOptions) {
             op1 = [point1[0], point1[1]];
             op2 = [point2[0], point2[1]];
         }
-        op1[2] = currentp[2] || 0;
-        op2[2] = currentp[2] || 0;
+        op1[2] = current[2] || 0;
+        op2[2] = current[2] || 0;
         // const [op1, op2] = calOffsetPoint(rRad, radius, p1);
         points.push(op1, op2);
         let needCut = false;
         if (cutCorner) {
             const bufferRadius = radius * 2;
-            if (distance(currentp, op1) > bufferRadius || distance(currentp, op2) > bufferRadius) {
+            if (distance(current, op1) > bufferRadius || distance(current, op2) > bufferRadius) {
                 needCut = true;
             }
         }
@@ -464,11 +470,11 @@ export function expandLine(line, options?: ExpandLineOptions) {
             if (distance(op1, p0) < distance(op2, p0)) {
                 cutPoint = op2;
             }
-            const dy = cutPoint[1] - currentp[1], dx = cutPoint[0] - currentp[0];
+            const dy = cutPoint[1] - current[1], dx = cutPoint[0] - current[0];
             const cutAngle = Math.atan2(dy, dx) / Math.PI * 180;
             const cutRad = degToRad(cutAngle);
-            const x1 = Math.cos(cutRad) * radius + currentp[0];
-            const y1 = Math.sin(cutRad) * radius + currentp[1];
+            const x1 = Math.cos(cutRad) * radius + current[0];
+            const y1 = Math.sin(cutRad) * radius + current[1];
             const v1 = [x1, y1];
 
             const hcutangle = cutAngle + 90;
@@ -492,8 +498,8 @@ export function expandLine(line, options?: ExpandLineOptions) {
             let cross1 = lineIntersection(preline[0], preline[1], v1, v2);
             let cross2 = lineIntersection(currentLine[0], currentLine[1], v1, v2);
 
-            cross1[2] = currentp[2] || 0;
-            cross2[2] = currentp[2] || 0;
+            cross1[2] = current[2] || 0;
+            cross2[2] = current[2] || 0;
             const repeatPoint = cutPoint === op1 ? op2 : op1;
             appendArray.push(cross1, cross2);
             repeatArray.push(repeatPoint, [...repeatPoint]);
@@ -517,7 +523,7 @@ export function expandLine(line, options?: ExpandLineOptions) {
 }
 
 // eslint-disable-next-line no-unused-vars
-function calOffsetPoint(rad, radius, p) {
+function calOffsetPoint(rad: number, radius: number, p: Point) {
     const [x, y] = p;
     const z = p[2] || 0;
     const x1 = Math.cos(rad) * radius, y1 = Math.sin(rad) * radius;
@@ -536,12 +542,12 @@ const getAngle = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => {
     // return (angle + 360) % 360;
 };
 
-function distance(p1, p2) {
+function distance(p1: Point, p2: Point) {
     const dx = p2[0] - p1[0], dy = p2[1] - p1[1];
     return Math.sqrt(dx * dx + dy * dy);
 }
 
-export function leftOnLine(p, p1, p2) {
+export function leftOnLine(p: Point, p1: Point, p2: Point) {
     const [x1, y1] = p1;
     const [x2, y2] = p2;
     const [x, y] = p;
@@ -555,7 +561,7 @@ export function leftOnLine(p, p1, p2) {
  * @param {*} distance
  * @returns
  */
-export function translateLine(p1, p2, distance) {
+export function translateLine(p1: Point, p2: Point, distance: number) {
     const dy = p2[1] - p1[1], dx = p2[0] - p1[0];
     if (dy === 0 && dx === 0) {
         return null;
@@ -581,7 +587,7 @@ export function translateLine(p1, p2, distance) {
  * @param {*} p4
  * @returns
  */
-function lineIntersection(p1, p2, p3, p4): Array<number> | null {
+function lineIntersection(p1: Point, p2: Point, p3: Point, p4: Point): Array<number> | null {
     const dx1 = p2[0] - p1[0], dy1 = p2[1] - p1[1];
     const dx2 = p4[0] - p3[0], dy2 = p4[1] - p3[1];
     //vertical 
