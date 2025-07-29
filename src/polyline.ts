@@ -343,17 +343,19 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
         }
     };
 
-    const equal = (p1, p2) => {
-        return p1[0] === p2[0] && p1[1] === p2[1];
-    };
 
     let i = 0;
-    let preleftline, prerightline;
+    let pre, preleftline, prerightline;
     while (i < len) {
         let p0: Point;
         let p1 = line[i],
             p2 = line[i + 1];
         const current = p1;
+        if (pre && equal(pre, current)) {
+            repeatVertex();
+            i++;
+            continue;
+        }
         // last vertex
         if (i === len - 1) {
             p1 = line[len - 2];
@@ -379,6 +381,7 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
             }
         }
         if (equal(p1, p2)) {
+            console.error('not find next vertex:index:', i, line);
             repeatVertex();
             i++;
             continue;
@@ -387,11 +390,11 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
         let dy = p2[1] - p1[1],
             dx = p2[0] - p1[0];
 
-        let rAngle = 0;
+        let rangle = 0;
         const rad = Math.atan2(dy, dx);
         const angle = radToDeg(rad);
         if (i === 0 || i === len - 1) {
-            rAngle = angle - 90;
+            rangle = angle - 90;
         } else {
             // 至少3个顶点才会触发
             p0 = line[i - 1];
@@ -405,6 +408,7 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
                 }
             }
             if (equal(p0, p2) || equal(p0, p1) || equal(p1, p2)) {
+                console.error('not find pre vertex:index:', i, line);
                 repeatVertex();
                 i++;
                 continue;
@@ -414,7 +418,7 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
             const angle1 = radToDeg(rad1);
             // 平行，回头路
             if (Math.abs(Math.abs(angle1 - angle) - 180) <= 0.0001) {
-                rAngle = angle - 90;
+                rangle = angle - 90;
             } else {
                 TEMPV1.x = p0[0] - p1[0];
                 TEMPV1.y = p0[1] - p1[1];
@@ -424,12 +428,15 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
                     console.error('has repeat vertex,the index:', i);
                 }
                 const vAngle = getAngle(TEMPV1, TEMPV2);
-                rAngle = angle - vAngle / 2;
+                if (Math.abs(vAngle) <= 1) {
+                    rangle = angle - 90;
+                } else {
+                    rangle = angle - vAngle / 2;
+                }
 
             }
         }
-
-        const rRad = degToRad(rAngle);
+        const rRad = degToRad(rangle);
         const p3 = current;
         const x = Math.cos(rRad) + p3[0], y = Math.sin(rRad) + p3[1];
         const p4 = [x, y];
@@ -515,12 +522,18 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
 
         preleftline = leftline;
         prerightline = rightline;
+        pre = current;
 
         i++;
     }
 
     return { offsetPoints: points, leftPoints, rightPoints, line };
 }
+
+function equal(p1: Point, p2: Point) {
+    return p1[0] === p2[0] && p1[1] === p2[1];
+}
+
 
 // eslint-disable-next-line no-unused-vars
 function calOffsetPoint(rad: number, radius: number, p: Point) {
