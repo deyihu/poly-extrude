@@ -140,7 +140,8 @@
 
         const map = new maptalks.Map("map", {
             center: [114.024072, 22.640064],
-            zoom: 12,
+            zoom: 26,
+            zoomControl: true
         });
         const layer1 = new maptalks.VectorLayer('layer1').addTo(map);
         const layer = new maptalks.VectorLayer('vector').addTo(map);
@@ -149,9 +150,9 @@
         const updateLine = (tempCoordinates) => {
             layer1.clear();
             const res = map.getResolution();
-            const width = map.getResolution() / 100000000;
-            console.log(width);
-            const result = polyextrude.expandLine(tempCoordinates, { lineWidth: width });
+            const width = map.getResolution() / 10000;
+            // console.log(width);
+            const result = polyextrude.expandLine(tempCoordinates, { lineWidth: width, cutCorner: false });
             console.log(result);
             const { leftPoints, rightPoints } = result;
             for (let i = 0, len = leftPoints.length; i < len; i++) {
@@ -181,7 +182,7 @@
         function test() {
             // map.setCenter([114.02370862, 22.63995672]);
             // map.setZoom(19);
-            let tempCoordinates = list.slice(0, 74).map(d => {
+            let tempCoordinates = list.slice(0, 100).map(d => {
                 return [...d.cood];
             })
             //  tempCoordinates=filterCoordinates(tempCoordinates);
@@ -208,13 +209,18 @@
                 });
             });
             layer.addGeometry(texts);
-            updateLine(tempCoordinates);
+
             map.setView({
                 center: tempCoordinates[tempCoordinates.length - 1],
-                zoom: 26
+                zoom: 20
             })
+            updateLine(tempCoordinates);
             // map.setZoom(25);
             map.setCenter(tempCoordinates[tempCoordinates.length - 1]);
+
+            map.on('zoomend', () => {
+                updateLine(tempCoordinates);
+            });
 
         }
 
