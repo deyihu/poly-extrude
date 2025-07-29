@@ -356,6 +356,7 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
             i++;
             continue;
         }
+        let lastRepeat = false;
         // last vertex
         if (i === len - 1) {
             p1 = line[len - 2];
@@ -379,6 +380,17 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
                     }
                 }
             }
+            if (equal(p1, p2)) {
+                lastRepeat = true;
+                for (let j = line.indexOf(p1); j >= 0; j--) {
+                    const p = line[j];
+                    if (!equal(p, current)) {
+                        p1 = p;
+                        break;
+                    }
+                }
+            }
+
         }
         if (equal(p1, p2)) {
             console.error('not find next vertex:index:', i, line);
@@ -393,7 +405,7 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
         let rangle = 0;
         const rad = Math.atan2(dy, dx);
         const angle = radToDeg(rad);
-        if (i === 0 || i === len - 1) {
+        if (i === 0 || i === len - 1 || lastRepeat) {
             rangle = angle - 90;
         } else {
             // 至少3个顶点才会触发
