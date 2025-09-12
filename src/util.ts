@@ -1,6 +1,8 @@
 import { Vector3 } from './math/Vector3';
 import { PolygonType, PolylineType, ResultType } from './type';
 
+type Point = Array<number>;
+
 export function mergeArray(array1, array2) {
     let index = array1.length - 1;
     for (let i = 0, len = array2.length; i < len; i++) {
@@ -309,4 +311,14 @@ export function calLineDistance(line) {
         }
     }
     return distance;
+}
+
+
+export function pointEqual(p1: Point, p2: Point) {
+    return p1[0] === p2[0] && p1[1] === p2[1];
+}
+
+export function pointDistance(p1: Point, p2: Point) {
+    const dx = p2[0] - p1[0], dy = p2[1] - p1[1];
+    return Math.sqrt(dx * dx + dy * dy);
 }

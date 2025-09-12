@@ -1,5 +1,6 @@
 import { PolylineType } from "./type";
-import { mergeArray } from "./util";
+import { mergeArray, pointDistance, pointEqual } from "./util";
+import { Bezier } from 'bezier-js';
 //https://github.com/bbecquet/Leaflet.PolylineOffset/blob/master/leaflet.polylineoffset.js
 
 /**
@@ -230,4 +231,62 @@ export function polylineOffset(line: PolylineType, options: polylineOffsetOption
         result.push([x, y, z]);
     }
     return result;
+}
+
+type polylineRoundOptions = {
+    roundSize: number,
+    steps?: number;
+}
+
+export function polylineRound(line: PolylineType, options: polylineRoundOptions): PolylineType {
+    options = Object.assign({ roundSize: 0, steps: 10 }, options);
+    if (options.roundSize === 0) {
+        return line;
+    }
+    if (!line || line.length < 3) {
+        return line;
+    }
+    const len = line.length;
+    const { roundSize, steps } = options;
+
+    const pts = [line[0]];
+    let pre = line[0];
+
+    for (let i = 1; i < len; i++) {
+        const p1 = line[i - 1], p2 = line[i], p3 = line[i + 1];
+        if (pointEqual(pre, p2)) {
+            continue;
+        }
+        if (!p3) {
+            continue;
+        }
+        const d1 = pointDistance(p2, p1), d2 = pointDistance(p2, p3);
+        if (d1 < roundSize || d2 < roundSize) {
+            pre = p2;
+            pts.push(p2);
+            continue;
+        }
+        const dx1 = p2[0] - p1[0], dy1 = p2[1] - p1[1];
+        const dx2 = p3[0] - p2[0], dy2 = p3[1] - p2[1];
+
+        const percent1 = (d1 - roundSize) / d1;
+        const percent2 = roundSize / d2;
+        const c1 = {
+            x: p1[0] + percent1 * dx1,
+            y: p1[1] + percent1 * dy1
+        };
+        const c2 = {
+            x: p2[0] + percent2 * dx2,
+            y: p2[1] + percent2 * dy2
+        };
+        const be = new Bezier([c1, { x: p2[0], y: p2[1] }, c2]);
+        const path = be.getLUT(steps);
+        for (let j = 0, len1 = path.length; j < len1; j++) {
+            const p = path[j];
+            pts.push([p.x, p.y]);
+        }
+        pre = p2;
+    }
+    pts.push(line[len- 1]);
+    return pts;
 }

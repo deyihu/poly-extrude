@@ -1,5 +1,5 @@
 import { PolylineType, ResultType } from './type';
-import { calLineDistance, degToRad, generateNormal, generateSideWallUV, merge, radToDeg } from './util';
+import { calLineDistance, degToRad, generateNormal, generateSideWallUV, merge, radToDeg, pointEqual, pointDistance } from './util';
 
 function checkOptions(options) {
     options.lineWidth = Math.max(0, options.lineWidth);
@@ -351,7 +351,7 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
         let p1 = line[i],
             p2 = line[i + 1];
         const current = p1;
-        if (pre && equal(pre, current)) {
+        if (pre && pointEqual(pre, current)) {
             repeatVertex();
             i++;
             continue;
@@ -361,30 +361,30 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
         if (i === len - 1) {
             p1 = line[len - 2];
             p2 = line[len - 1];
-            if (equal(p1, p2)) {
+            if (pointEqual(p1, p2)) {
                 for (let j = line.indexOf(p1); j >= 0; j--) {
                     const p = line[j];
-                    if (!equal(p, current)) {
+                    if (!pointEqual(p, current)) {
                         p1 = p;
                         break;
                     }
                 }
             }
         } else {
-            if (equal(p1, p2)) {
+            if (pointEqual(p1, p2)) {
                 for (let j = line.indexOf(p2); j < len; j++) {
                     const p = line[j];
-                    if (!equal(p, current)) {
+                    if (!pointEqual(p, current)) {
                         p2 = p;
                         break;
                     }
                 }
             }
-            if (equal(p1, p2)) {
+            if (pointEqual(p1, p2)) {
                 lastRepeat = true;
                 for (let j = line.indexOf(p1); j >= 0; j--) {
                     const p = line[j];
-                    if (!equal(p, current)) {
+                    if (!pointEqual(p, current)) {
                         p1 = p;
                         break;
                     }
@@ -392,7 +392,7 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
             }
 
         }
-        if (equal(p1, p2)) {
+        if (pointEqual(p1, p2)) {
             console.error('not find next vertex:index:', i, line);
             repeatVertex();
             i++;
@@ -410,16 +410,16 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
         } else {
             // 至少3个顶点才会触发
             p0 = line[i - 1];
-            if (equal(p0, p2) || equal(p0, p1)) {
+            if (pointEqual(p0, p2) || pointEqual(p0, p1)) {
                 for (let j = line.indexOf(p2); j >= 0; j--) {
                     const p = line[j];
-                    if (!equal(p, p2) && (!equal(p, p1))) {
+                    if (!pointEqual(p, p2) && (!pointEqual(p, p1))) {
                         p0 = p;
                         break;
                     }
                 }
             }
-            if (equal(p0, p2) || equal(p0, p1) || equal(p1, p2)) {
+            if (pointEqual(p0, p2) || pointEqual(p0, p1) || pointEqual(p1, p2)) {
                 console.error('not find pre vertex:index:', i, line);
                 repeatVertex();
                 i++;
@@ -480,13 +480,13 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
         let needCut = false;
         if (cutCorner) {
             const bufferRadius = radius * 2;
-            if (distance(current, op1) > bufferRadius || distance(current, op2) > bufferRadius) {
+            if (pointDistance(current, op1) > bufferRadius || pointDistance(current, op2) > bufferRadius) {
                 needCut = true;
             }
         }
         if (needCut && p0 && preleftline && prerightline) {
             let cutPoint = op1;
-            if (distance(op1, p0) < distance(op2, p0)) {
+            if (pointDistance(op1, p0) < pointDistance(op2, p0)) {
                 cutPoint = op2;
             }
             const dy = cutPoint[1] - current[1], dx = cutPoint[0] - current[0];
@@ -542,10 +542,6 @@ export function expandLine(line: Array<Array<number>>, options?: ExpandLineOptio
     return { offsetPoints: points, leftPoints, rightPoints, line };
 }
 
-function equal(p1: Point, p2: Point) {
-    return p1[0] === p2[0] && p1[1] === p2[1];
-}
-
 
 // eslint-disable-next-line no-unused-vars
 function calOffsetPoint(rad: number, radius: number, p: Point) {
@@ -567,10 +563,6 @@ const getAngle = ({ x: x1, y: y1 }, { x: x2, y: y2 }) => {
     // return (angle + 360) % 360;
 };
 
-function distance(p1: Point, p2: Point) {
-    const dx = p2[0] - p1[0], dy = p2[1] - p1[1];
-    return Math.sqrt(dx * dx + dy * dy);
-}
 
 export function leftOnLine(p: Point, p1: Point, p2: Point) {
     const [x1, y1] = p1;
