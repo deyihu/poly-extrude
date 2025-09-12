@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name=renderer content=webkit>
+<script type="text/javascript" src="https://unpkg.com/@maptalks/geojson-bbox@1.0.4/dist/bbox.umd.js"></script>
+<script type="text/javascript" src="https://unpkg.com/three@0.138.0/build/three.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/three@0.142.0/examples/js/controls/OrbitControls.js"></script>
+<script type="text/javascript" src="https://unpkg.com/poly-extrude/dist/poly-extrude.js"></script>
+<script type="text/javascript" src="https://unpkg.com/maptalks/dist/maptalks.min.js"></script>
+<script type="text/javascript" src="./util.js"></script>
+<!-- <script type="text/javascript" src="http://localhost/geometry-extrude/dist/geometry-extrude.js"></script> -->
+
+<style type="text/css">
+    html,
+    body {
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .container {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<body>
+    <div id="map" class="container"></div>
+    <script>
+
+
+        const map = new maptalks.Map("map", {
+            "center": [120.65296958, 31.16514795], "zoom": 13.280834101951315, "pitch": 0, "bearing": 0.6336730911726818,
+            // baseLayer: new maptalks.TileLayer("base", {
+            //     urlTemplate: "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",
+            //     subdomains: ["a", "b", "c", "d"],
+            //     // attribution: "&copy; <a href='http://osm.org'>OpenStreetMap</a> contributors, &copy; <a href='https://carto.com/'>CARTO</a>",
+            // }),
+        });
+
+        const layer = new maptalks.VectorLayer('layer', {
+            forceRenderOnMoving: true,
+            forceRenderOnZooming: true,
+            forceRenderOnRotating: true,
+            progressiveRender: false,
+            progressiveRenderCount: 500,
+            progressiveRenderDebug: false,
+        }).addTo(map);
+
+        const symbol1 = {
+            lineWidth: 1,
+            lineColor: 'black',
+            lineDasharray: [5, 5]
+        }
+
+        const symbol2 = {
+            lineColor: 'red',
+            lineWidth: 2
+        }
+
+        map.setView({
+            "center": [120.61116868, 30.96746426], "zoom": 19.093662251338547, "pitch": 0, "bearing": 2.583673091172386
+        })
+
+
+        function test() {
+            getGeoJSON('./data/line-round.geojson').then(geojson => {
+                // flatCoordinates(geojson);
+                geojson.features.slice(0, Infinity).forEach(feature => {
+                    let { type, coordinates } = feature.geometry;
+                    if (!type.includes('LineString')) {
+                        return;
+                    }
+
+                    if (type === 'LineString') {
+                        coordinates = [coordinates];
+                    }
+                    coordinates.forEach(coordinate => {
+                        const offset = 0.00005;
+                        let ring = [];
+                        const result = polyextrude.polylineRound(coordinate, { roundSize: offset });
+
+                        const line1 = new maptalks.LineString(coordinate, {
+                            symbol: {
+                                ...symbol1
+                            }
+                        });
+                        line1.addTo(layer);
+                        const line2 = new maptalks.LineString(result, {
+                            symbol: {
+                                ...symbol2
+                            }
+                        });
+                        line2.addTo(layer);
+                    });
+                });
+            })
+        }
+        test();
+
+
+
+    </script>
+</body>
+
+</html>
