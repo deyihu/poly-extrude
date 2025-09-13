@@ -5,7 +5,7 @@ import { expandPaths } from './path';
 import { expandTubes } from './tube';
 import { plane } from './plane';
 import { extrudePolygonsOnPath } from './polygonpath';
-import { polylineOffset, polylineRound } from './polylineoffset';
+import { polylineOffset, polylineRound } from './polylinehelper';
 import { isClockwise, merge } from './util';
 export {
     isClockwise, merge,
