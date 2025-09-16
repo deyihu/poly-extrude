@@ -314,11 +314,17 @@ export function calLineDistance(line) {
 }
 
 
-export function pointEqual(p1: Point, p2: Point) {
+export function pointEqual(p1: Point, p2: Point, considerZ?: boolean) {
+    if (considerZ) {
+        return p1[0] === p2[0] && p1[1] === p2[1] && (p1[2] || 0) === (p2[2] || 0);
+    }
     return p1[0] === p2[0] && p1[1] === p2[1];
 }
 
-export function pointDistance(p1: Point, p2: Point) {
-    const dx = p2[0] - p1[0], dy = p2[1] - p1[1];
+export function pointDistance(p1: Point, p2: Point, considerZ?: boolean) {
+    const dx = p2[0] - p1[0], dy = p2[1] - p1[1], dz = (p2[2] || 0) - (p1[2] || 0);
+    if (considerZ) {
+        Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
     return Math.sqrt(dx * dx + dy * dy);
 }

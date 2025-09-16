@@ -258,42 +258,48 @@ export function polylineRound(line: PolylineType, options: polylineRoundOptions)
         if (!p3 || !p1 || !p2) {
             continue;
         }
-        if (pointEqual(pre, p2)) {
+        if (pointEqual(pre, p2, true)) {
             continue;
         }
-        const d1 = pointDistance(p2, p1), d2 = pointDistance(p2, p3);
+        const d1 = pointDistance(p2, p1, true), d2 = pointDistance(p2, p3, true);
         if (d1 < roundSize || d2 < roundSize) {
             pre = p2;
             points[++idx] = p2;
             continue;
         }
-        const dx1 = p2[0] - p1[0], dy1 = p2[1] - p1[1];
-        const dx2 = p3[0] - p2[0], dy2 = p3[1] - p2[1];
+        const dx1 = p2[0] - p1[0], dy1 = p2[1] - p1[1], dz1 = (p2[2] || 0) - (p1[2] || 0);
+        const dx2 = p3[0] - p2[0], dy2 = p3[1] - p2[1], dz2 = (p3[2] || 0) - (p2[2] || 0);
 
         const percent1 = (d1 - roundSize) / d1;
         const percent2 = roundSize / d2;
         const c1 = {
             x: p1[0] + percent1 * dx1,
-            y: p1[1] + percent1 * dy1
+            y: p1[1] + percent1 * dy1,
+            z: (p1[2] || 0) + percent1 * dz1
         };
         const c2 = {
             x: p2[0] + percent2 * dx2,
-            y: p2[1] + percent2 * dy2
+            y: p2[1] + percent2 * dy2,
+            z: (p2[2] || 0) + percent2 * dz2
         };
-        const d3 = pointDistance([c1.x, c1.y], [c2.x, c2.y]);
+        const d3 = pointDistance([c1.x, c1.y, c1.z], [c2.x, c2.y, c2.z], true);
         if (d3 < roundSize / 10) {
             pre = p2;
             points[++idx] = p2;
             continue;
         }
-        const be = new Bezier([c1, { x: p2[0], y: p2[1] }, c2]);
+        const be = new Bezier([c1, { x: p2[0], y: p2[1], z: p2[2] || 0 }, c2]);
         const path = be.getLUT(steps);
         for (let j = 0, len1 = path.length; j < len1; j++) {
             const p = path[j];
-            points[++idx] = [p.x, p.y];
+            points[++idx] = [p.x, p.y, p.z];
         }
         pre = p2;
     }
     points.push(line[len - 1]);
+    for (let i = 0, len = points.length; i < len; i++) {
+        const p = points[i];
+        p[2] = p[2] || 0;
+    }
     return points;
 }
